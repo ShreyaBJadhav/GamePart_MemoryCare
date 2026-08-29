@@ -9,8 +9,8 @@ This repo covers the **patient-side games, adaptive difficulty engine, local sto
 ## Getting started
 
 ```bash
-git clone <this-repo-url>
-cd <folder-name>
+git clone <https://github.com/ShreyaBJadhav/GamePart_MemoryCare.git>
+cd <memorycare-ner>
 npm install
 npm run dev
 ```
