@@ -1,59 +1,21 @@
-<!-- index.html
-     Minimal standalone shell for testing PatternMatchingGame as an
-     installable, offline-capable PWA — independent of the team's
-     final app shell. Useful for your own demo/testing right now.
-
-     For a real Create React App / Vite project, most of this
-     (manifest link, service worker registration) belongs in your
-     existing public/index.html and src/index.js instead — this
-     file is a quick standalone version so you don't have to wait
-     on the rest of the app to test installability.
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MemoryCare NER — Find the Match</title>
-
-  <!-- PWA manifest -->
-  <link rel="manifest" href="/manifest.json" />
+  <title>MemoryCare NER</title>
+  <link rel="manifest" href="./manifest.json" />
   <meta name="theme-color" content="#D85A30" />
-
-  <!-- iOS PWA support (Safari doesn't read manifest.json fully) -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="MemoryCare" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-
-  <style>
-    body { margin: 0; background: #FDF6EC; }
-  </style>
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="icon" type="image/png" href="./icons/icon-192.png" />
+  <link rel="stylesheet" href="./css/app.css" />
 </head>
 <body>
-  <div id="root"></div>
-
-  <!--
-    This assumes you're bundling PatternMatchingGame.jsx with a
-    build tool (Vite/CRA) that outputs a bundle.js. If you're using
-    Create React App or Vite, delete this script tag — your build
-    tool's own index.html + src/index.js already handles mounting
-    the React app, you only need to copy the manifest link + SW
-    registration below into that existing file.
-  -->
-  <script type="module" src="/src/index.js"></script>
-
-  <script>
-    // ---- Service worker registration ----
-    // Registers on load; browser handles install/update lifecycle.
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("/service-worker.js")
-          .then((reg) => console.log("Service worker registered:", reg.scope))
-          .catch((err) => console.error("Service worker registration failed:", err));
-      });
-    }
-  </script>
+  <div id="app"></div>
+  <script src="./vendor/dexie.min.js"></script>
+  <script type="module" src="./js/main.js"></script>
 </body>
 </html>

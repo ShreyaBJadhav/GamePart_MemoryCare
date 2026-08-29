@@ -1,3 +1,27 @@
-node_modules/
-dist/
+# Python / Flask
+__pycache__/
+*.pyc
+venv/
+env/
+.venv/
+*.egg-info/
+instance/
+
+# Environment / secrets
 .env
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+
+# Leftover Node stuff, just in case anything reappears
+node_modules/
+package-lock.json
+
+# Logs
+*.log

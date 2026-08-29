@@ -1,23 +1,23 @@
 # MemoryCare NER — Cognitive Games Module
 
-Patient-side cognitive gaming module for **MemoryCare NER**, an offline-first Progressive Web App (PWA) built for elderly dementia patients in the North Eastern Region of India — Smart India Hackathon 2026.
+Patient-side cognitive gaming module for **MemoryCare NER**, an offline-first Progressive Web App for elderly patients in the North Eastern Region of India — Smart India Hackathon 2026, team Elite's Alliance.
 
-This repo covers the **patient-side games, adaptive difficulty engine, local storage, and voice assistance**. Nurse/Family dashboards, backend sync, and the reminder system are separate, later-stage modules that will read from the same local data layer.
+This folder is **static files only** (plus a tiny Flask app that serves them). There is no Node.js, npm, Vite, or build step.
 
 ---
 
 ## Getting started
 
 ```bash
-git clone <this-repo-url>
-cd <folder-name>
-npm install
-npm run dev
+pip install -r requirements.txt
+python app.py
 ```
 
-The dev server will print a local URL (typically `http://localhost:5173`) — open it in Chrome for the best PWA/DevTools support.
+Then open `http://localhost:5000` in Chrome.
 
-**Note:** the service worker is intentionally disabled in dev mode to avoid stale-cache issues while developing — it only activates in a production build (`npm run build`).
+Service workers need `http://` or `https://`. Opening `index.html` via `file://` is a known limitation.
+
+Flask only serves the existing static files. It does not add a database or API yet.
 
 ---
 
@@ -25,70 +25,54 @@ The dev server will print a local URL (typically `http://localhost:5173`) — op
 
 | Layer | Technology |
 |---|---|
-| Frontend / build | Vite |
-| Local storage | Dexie.js (wrapper over IndexedDB) |
+| Frontend | Native ES modules (plain `.js` files, no bundler) |
+| Local storage | Dexie.js over IndexedDB (UMD file in `vendor/`) |
 | Voice output | Web Speech API (`SpeechSynthesisUtterance`) — English + Hindi |
-| PWA | Web App Manifest, Service Worker, Cache API |
-| Offline support | Fully offline after first load — no network calls at runtime |
+| PWA | Hand-written `manifest.json` + `sw.js` |
 
-Everything here is client-side only. No backend, API, or server database is part of this module — that's a separate future piece (Flask + PostgreSQL, per the team architecture doc).
+After the first load, the app makes no network calls at runtime.
 
 ---
 
 ## The 4 games
 
-1. **Pattern Matching** — classic card-flip memory match
-2. **Shape Sort** — rule-based selective attention task (e.g. "Tap all the circles" / "Find all the red objects"); not a sort-into-bins game
-3. **Face-Name Recall** — shown an unlabeled photo, patient picks the correct person from 4 choices formatted as "Name (Relationship)"
-4. **My Daily Routine** — patient reorders a shuffled set of their actual daily activities into the correct sequence
+1. **Pattern Matching** — card-flip memory match
+2. **Shape Sort** — selective-attention task ("tap all the circles" / "tap all the orange shapes")
+3. **Face-Name Recall** — unlabeled face, pick `"Name (Relationship)"` from 4 choices
+4. **My Daily Routine** — reorder shuffled daily activities (tap Up / Down, not drag)
 
-Each game has 5 difficulty levels, implemented as presets along continuous dimensions (pair count, sequence length, distractor count, time pressure) rather than a fixed "complete and you're done" ladder.
+Each game has 5 difficulty levels along pair count, sequence length, distractor count, and time pressure.
 
 ---
 
-## Adaptive difficulty engine
+## Adaptive difficulty
 
-Rule-based (not ML) — tracks accuracy, reaction time, mistakes, and attempts per session, shared across all 4 games:
+Rule-based (not ML). Tracks accuracy, reaction time, mistakes, and attempts:
 
 - High accuracy + fast + few mistakes → level up by exactly 1
 - Low accuracy + slow + many mistakes → level down by exactly 1
 - Never more than one level change at a time
-- A `manualLevelOverride` field on each patient/game record can cap or fix the level (caregiver-facing UI for this comes later)
+- `manualLevelOverride` is stored on each patient/game record (caregiver UI is later work)
+
+New `game_results` rows always start with `sync_status: "PENDING"`. Nothing in this module sets `"SYNCED"`.
 
 ---
 
-## Voice assistance
+## Testing offline behavior
 
-Text-to-speech only — the app reads rules, questions, instructions, and feedback aloud in **English or Hindi**. This is not speech recognition; the patient does not speak back to control the app (that's a separate future feature).
-
-A **"🔊 Repeat"** button on every game screen re-reads the last spoken content.
-
-**Known gap:** NER regional languages (Assamese, Bodo, Manipuri, Khasi, Mizo, etc.) are not yet supported — browser TTS voices don't reliably cover them. Flagged as a future addition requiring a dedicated Indic TTS model.
-
----
-
-## Testing offline behavior (important for this project)
-
-1. Open the app once with internet on, so the service worker can install and cache assets
-2. Open Chrome DevTools → **Application** tab → **Service Workers** — confirm one is registered and "activated"
-3. In the **Network** tab, check **Offline**, then refresh the page — confirm the games still load and play with zero internet
-4. Check **Application → IndexedDB** to inspect stored `game_results` — confirm each record has the correct `gameType` and starts with `sync_status: "PENDING"`
+1. Open the app once over `http://` so the service worker can install
+2. DevTools → Application → Service Workers — one worker, **activated**
+3. Network → Offline, then refresh — all 4 games still load
+4. Application → IndexedDB → `game_results` — each record has `sync_status: "PENDING"`
+5. Application → Manifest — cream `#FDF6EC` / terracotta `#D85A30`, icons present
 
 ---
 
 ## Out of scope for this module
 
 - Nurse and Family dashboards
-- Backend / sync engine (only the `sync_status` data field is in place, not the actual sync logic)
-- Speech-to-text / voice commands (planned future feature via Whisper-tiny)
-- Face authentication/login (MobileFaceNet) — unrelated to the Face-Name Recall *game*
+- SQLite backend and the sync engine
+- Speech-to-text
+- Face authentication
 - Reminder system
-- SQLite/wa-sqlite/OPFS storage (noted in the architecture doc as a future production target; this module uses IndexedDB via Dexie.js)
-
----
-
-## Design principles
-
-- Elderly-friendly UI: large buttons, high contrast, minimal navigation, few choices per screen
-- No diagnostic language anywhere in patient-facing text (feedback describes the activity, never the patient's cognitive state)
-- Cream `#FDF6EC` / terracotta `#D85A30` palette
+- Switching storage away from Dexie/IndexedDB
