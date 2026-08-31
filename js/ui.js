@@ -1,5 +1,11 @@
 import { t } from "./i18n.js";
 import { repeatLast } from "./voice.js";
+import { clampLevel, levelTier } from "./adaptive.js";
+
+export function levelSubtitle(lang, level) {
+  const n = clampLevel(level);
+  return `${t(lang, "level")} ${n} · ${t(lang, levelTier(n))}`;
+}
 
 export function el(tag, props = {}, ...children) {
   const node = document.createElement(tag);
@@ -45,12 +51,12 @@ export function summaryView(lang, result, { onRestart, onHome }) {
   return el("div", { className: "summary screen" },
     el("div", { className: "star" }, "⭐"),
     el("h2", {}, t(lang, "wellDone")),
-    row(t(lang, "level"), String(result.level)),
+    row(t(lang, "level"), levelSubtitle(lang, result.level)),
     row(t(lang, "accuracy"), `${result.accuracyPercent}%`),
     row(t(lang, "timeTaken"), `${result.totalTimeSeconds}s`),
     row(t(lang, "attempts"), String(result.attempts)),
     row(t(lang, "mistakes"), String(result.mistakes)),
-    row(t(lang, "nextSession"), `${t(lang, "level")} ${result.nextPlayLevel}`),
+    row(t(lang, "nextSession"), levelSubtitle(lang, result.nextPlayLevel)),
     el("button", { className: "btn", type: "button", style: { marginTop: "24px", width: "100%" }, onClick: onRestart }, t(lang, "playAgain")),
     el("button", { className: "btn", type: "button", style: { marginTop: "12px", width: "100%", background: "#3B3B3F" }, onClick: onHome }, t(lang, "home")),
   );

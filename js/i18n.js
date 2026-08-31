@@ -15,6 +15,9 @@ const STRINGS = {
     attempts: "Attempts",
     mistakes: "Mistakes",
     nextSession: "Next session",
+    easy: "Easy",
+    medium: "Medium",
+    hard: "Hard",
     patternName: "Find the Match",
     patternBlurb: "Flip two cards and find the pairs",
     shapeName: "Shape Sort",
@@ -33,6 +36,31 @@ const STRINGS = {
     nice: "That's the one",
     allFound: "You found them all",
     checkOrder: "Let's look at the order once more",
+    familyPhotos: "Family photos",
+    familyHelp: "Add a photo, name, and how this person is related.",
+    personName: "Name",
+    personPhoto: "Photo",
+    personRelation: "Relationship",
+    addPerson: "Save person",
+    startGame: "Start the game",
+    noPhoto: "Please add a photo.",
+    facePromptWho: "Who is this?",
+    facePromptWhoRelated: "Who is this? How is this person related to you?",
+    facePromptRelated: "How is this person related to you?",
+    facePromptWhich: "Which one is your {rel}?",
+    rel_mother: "Mother",
+    rel_father: "Father",
+    rel_daughter: "Daughter",
+    rel_son: "Son",
+    rel_sister: "Sister",
+    rel_brother: "Brother",
+    rel_spouse: "Spouse",
+    rel_neighbor: "Neighbor",
+    rel_nurse: "Nurse",
+    rel_doctor: "Doctor",
+    rel_granddaughter: "Granddaughter",
+    rel_grandson: "Grandson",
+    rel_friend: "Friend",
   },
   hi: {
     appTitle: "MemoryCare",
@@ -50,6 +78,9 @@ const STRINGS = {
     attempts: "कोशिशें",
     mistakes: "गलतियाँ",
     nextSession: "अगला सत्र",
+    easy: "आसान",
+    medium: "मध्यम",
+    hard: "कठिन",
     patternName: "जोड़ी ढूँढें",
     patternBlurb: "दो पत्ते पलटकर जोड़ी मिलाएँ",
     shapeName: "आकार छाँटें",
@@ -68,10 +99,63 @@ const STRINGS = {
     nice: "यह सही है",
     allFound: "आपने सभी ढूँढ लीं",
     checkOrder: "चलो क्रम एक बार और देखते हैं",
+    familyPhotos: "परिवार की तस्वीरें",
+    familyHelp: "तस्वीर, नाम, और रिश्ता जोड़ें।",
+    personName: "नाम",
+    personPhoto: "तस्वीर",
+    personRelation: "रिश्ता",
+    addPerson: "व्यक्ति सहेजें",
+    startGame: "खेल शुरू करें",
+    noPhoto: "कृपया एक तस्वीर जोड़ें।",
+    facePromptWho: "यह कौन हैं?",
+    facePromptWhoRelated: "यह कौन हैं? आपसे कैसे जुड़े हैं?",
+    facePromptRelated: "यह व्यक्ति आपसे कैसे जुड़े हैं?",
+    facePromptWhich: "आपकी {rel} कौन हैं?",
+    rel_mother: "माँ",
+    rel_father: "पिता",
+    rel_daughter: "बेटी",
+    rel_son: "बेटा",
+    rel_sister: "बहन",
+    rel_brother: "भाई",
+    rel_spouse: "जीवनसाथी",
+    rel_neighbor: "पड़ोसी",
+    rel_nurse: "नर्स",
+    rel_doctor: "डॉक्टर",
+    rel_granddaughter: "पोती",
+    rel_grandson: "पोता",
+    rel_friend: "मित्र",
   },
 };
 
 export function t(lang, key) {
   const pack = STRINGS[lang] || STRINGS.en;
   return pack[key] || STRINGS.en[key] || key;
+}
+
+export const RELATIONSHIP_KEYS = [
+  "mother",
+  "father",
+  "daughter",
+  "son",
+  "sister",
+  "brother",
+  "spouse",
+  "neighbor",
+  "nurse",
+  "doctor",
+  "granddaughter",
+  "grandson",
+  "friend",
+];
+
+export function tRel(lang, key) {
+  return t(lang, `rel_${key}`);
+}
+
+export function tf(lang, key, vars = {}) {
+  let text = t(lang, key);
+  for (const [name, value] of Object.entries(vars)) {
+    text = text.replaceAll(`{${name}}`, value);
+  }
+  return text;
 }

@@ -21,6 +21,13 @@ db.version(1).stores({
   game_results: "++id, gameType, timestamp, sync_status",
 });
 
+db.version(2).stores({
+  patients: "++id",
+  gameProgress: "++id, patientId, gameType, [patientId+gameType]",
+  game_results: "++id, gameType, timestamp, sync_status",
+  familyMembers: "++id, patientId, relationshipKey",
+});
+
 export async function ensurePatient() {
   const existing = await db.patients.get(DEFAULT_PATIENT_ID);
   if (!existing) {
@@ -42,8 +49,70 @@ export async function ensurePatient() {
         currentLevel: 1,
         manualLevelOverride: null,
       });
+    } else {
+      const patch = {};
+      const clampedCurrent = clampLevel(row.currentLevel);
+      if (row.currentLevel !== clampedCurrent) patch.currentLevel = clampedCurrent;
+      if (row.manualLevelOverride != null) {
+        const clampedOverride = clampLevel(row.manualLevelOverride);
+        if (row.manualLevelOverride !== clampedOverride) {
+          patch.manualLevelOverride = clampedOverride;
+        }
+      }
+      if (Object.keys(patch).length) {
+        await db.gameProgress.update(row.id, patch);
+      }
     }
   }
+
+  await seedFamilyIfEmpty();
+}
+
+const DEMO_FAMILY = [
+  { name: "Meena", relationshipKey: "daughter", hue: "#D85A30" },
+  { name: "Rajesh", relationshipKey: "son", hue: "#C0432E" },
+  { name: "Lata", relationshipKey: "sister", hue: "#8A4A32" },
+  { name: "Suresh", relationshipKey: "neighbor", hue: "#3B3B3F" },
+  { name: "Anita", relationshipKey: "nurse", hue: "#E28364" },
+  { name: "Priya", relationshipKey: "granddaughter", hue: "#B85C38" },
+  { name: "Ravi", relationshipKey: "grandson", hue: "#9C5A2C" },
+  { name: "Kamal", relationshipKey: "doctor", hue: "#59595D" },
+];
+
+function placeholderPhoto(name, hue) {
+  const letter = (name || "?").slice(0, 1).toUpperCase();
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect fill="${hue}" width="400" height="400"/><text x="200" y="245" text-anchor="middle" font-size="180" fill="#FDF6EC" font-family="system-ui,sans-serif">${letter}</text></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
+async function seedFamilyIfEmpty() {
+  const count = await db.familyMembers.where("patientId").equals(DEFAULT_PATIENT_ID).count();
+  if (count > 0) return;
+  for (const person of DEMO_FAMILY) {
+    await db.familyMembers.add({
+      patientId: DEFAULT_PATIENT_ID,
+      name: person.name,
+      relationshipKey: person.relationshipKey,
+      photoDataUrl: placeholderPhoto(person.name, person.hue),
+    });
+  }
+}
+
+export async function listFamilyMembers() {
+  return db.familyMembers.where("patientId").equals(DEFAULT_PATIENT_ID).toArray();
+}
+
+export async function addFamilyMember({ name, relationshipKey, photoDataUrl }) {
+  return db.familyMembers.add({
+    patientId: DEFAULT_PATIENT_ID,
+    name: String(name || "").trim(),
+    relationshipKey,
+    photoDataUrl,
+  });
+}
+
+export async function deleteFamilyMember(id) {
+  return db.familyMembers.delete(id);
 }
 
 export async function getLanguage() {

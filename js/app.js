@@ -1,4 +1,4 @@
-import { el, clear, header } from "./ui.js";
+import { el, clear, header, levelSubtitle } from "./ui.js";
 import { t } from "./i18n.js";
 import { speak, setVoiceLang } from "./voice.js";
 import { ensurePatient, getLanguage, setLanguage, getPlayLevel, GAME_TYPES } from "./db.js";
@@ -6,6 +6,7 @@ import { mountPatternMatching } from "./games/patternMatching.js";
 import { mountShapeSort } from "./games/shapeSort.js";
 import { mountFaceNameRecall } from "./games/faceNameRecall.js";
 import { mountDailyRoutine } from "./games/dailyRoutine.js";
+import { mountFamilyPhotos } from "./familyPeople.js";
 
 const GAMES = [
   { id: GAME_TYPES.pattern_matching, nameKey: "patternName", blurbKey: "patternBlurb", mount: mountPatternMatching },
@@ -64,12 +65,19 @@ async function showHome(root) {
       },
         el("strong", {}, t(lang, game.nameKey)),
         el("span", {}, t(lang, game.blurbKey)),
-        el("span", { style: { display: "block", marginTop: "8px", color: "#59595D" } }, `${t(lang, "level")} ${level}`),
+        el("span", { style: { display: "block", marginTop: "8px", color: "#59595D" } }, levelSubtitle(lang, level)),
       ),
     );
   }
 
-  root.append(el("main", { className: "screen" }, langRow, grid));
+  root.append(el("main", { className: "screen" }, langRow, grid,
+    el("button", {
+      className: "btn",
+      type: "button",
+      style: { width: "100%", marginTop: "18px" },
+      onClick: () => mountFamilyPhotos(root, { lang, onBack: () => showHome(root) }),
+    }, t(lang, "familyPhotos")),
+  ));
 }
 
 async function openGame(root, game) {

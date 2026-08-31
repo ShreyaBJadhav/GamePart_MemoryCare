@@ -1,49 +1,63 @@
-import { el, clear, header, summaryView } from "../ui.js";
+import { el, clear, header, summaryView, levelSubtitle } from "../ui.js";
 import { t } from "../i18n.js";
 import { speak } from "../voice.js";
-import { applyAdaptiveAndSave, GAME_TYPES } from "../db.js";
+import { applyAdaptiveAndSave, GAME_TYPES, listFamilyMembers } from "../db.js";
 import { clampLevel } from "../adaptive.js";
-import { buildFaceNameRound, choiceLabel } from "../content/faceNameContent.js";
+import { buildFaceSession, choiceText } from "../content/faceNameContent.js";
+import { mountFamilyPhotos } from "../familyPeople.js";
 
-function avatarSvg(person) {
-  const box = el("div");
-  box.innerHTML = `
-    <svg width="140" height="140" viewBox="0 0 100 100" aria-hidden="true">
-      <circle cx="50" cy="50" r="46" fill="${person.hue}" />
-      <circle cx="50" cy="38" r="18" fill="#FAECE7" />
-      <ellipse cx="50" cy="78" rx="28" ry="22" fill="#FAECE7" />
-      <path d="M32 30 Q50 8 68 30" fill="${person.hair}" />
-      <circle cx="43" cy="38" r="3" fill="#3B3B3F" />
-      <circle cx="57" cy="38" r="3" fill="#3B3B3F" />
-    </svg>`;
-  return box.firstElementChild;
+function personPhoto(person, className) {
+  return el("img", {
+    className,
+    src: person.photoDataUrl,
+    alt: person.name,
+  });
 }
 
-export function mountFaceNameRecall(root, { lang, level, onHome }) {
+export async function mountFaceNameRecall(root, { lang, level, onHome }) {
   const activeLevel = clampLevel(level);
+  const pool = await listFamilyMembers();
+  if (pool.length < 3) {
+    await mountFamilyPhotos(root, {
+      lang,
+      onBack: onHome,
+      onPlay: () => mountFaceNameRecall(root, { lang, level: activeLevel, onHome }),
+    });
+    return;
+  }
+
+  const session = buildFaceSession(activeLevel, pool, lang);
+  const rounds = session.rounds;
   let roundIndex = 0;
   let attempts = 0;
   let correctCount = 0;
   const sessionStart = Date.now();
   const responseTimes = [];
   let roundStart = Date.now();
-  let current = buildFaceNameRound(activeLevel, lang);
-  const totalRounds = current.rounds;
   let resumeLevel = activeLevel;
 
   function restart() {
     mountFaceNameRecall(root, { lang, level: resumeLevel, onHome });
   }
 
-  speak(t(lang, "faceHelp"));
+  speakRound();
   render();
+
+  function current() {
+    return rounds[roundIndex];
+  }
+
+  function speakRound() {
+    const round = current();
+    if (round) speak(round.prompt);
+  }
 
   function render(complete = false, summary = null) {
     clear(root);
     root.append(
       header(lang, {
         title: t(lang, "faceName"),
-        subtitle: `${t(lang, "level")} ${activeLevel} · ${roundIndex + (complete ? 0 : 1)} / ${totalRounds}`,
+        subtitle: `${levelSubtitle(lang, activeLevel)} · ${roundIndex + (complete ? 0 : 1)} / ${rounds.length}`,
         onBack: onHome,
       }),
     );
@@ -52,43 +66,59 @@ export function mountFaceNameRecall(root, { lang, level, onHome }) {
       return;
     }
 
-    const choices = el("div", { className: "choice-col" });
-    current.choices.forEach((person) => {
-      choices.append(
-        el("button", {
-          className: "btn",
-          type: "button",
-          onClick: () => handleChoice(person),
-        }, choiceLabel(person, lang)),
-      );
-    });
-
-    root.append(
-      el("main", { className: "screen" },
-        el("p", { className: "instruction" }, t(lang, "faceHelp")),
-        el("div", { className: "face-stage" }, avatarSvg(current.target)),
-        choices,
-      ),
+    const round = current();
+    const body = el("main", { className: "screen" },
+      el("p", { className: "instruction" }, round.prompt),
     );
+
+    if (round.mode === "photos") {
+      const grid = el("div", { className: "face-option-grid" });
+      round.choices.forEach((person) => {
+        grid.append(
+          el("button", {
+            className: "face-option-btn",
+            type: "button",
+            onClick: () => handleChoice(person),
+          }, personPhoto(person, "face-option-photo")),
+        );
+      });
+      body.append(grid);
+    } else {
+      body.append(
+        el("div", { className: "face-stage" }, personPhoto(round.target, "face-stage-photo")),
+      );
+      const choices = el("div", { className: "choice-col" });
+      round.choices.forEach((person) => {
+        choices.append(
+          el("button", {
+            className: "choice-btn",
+            type: "button",
+            onClick: () => handleChoice(person),
+          }, choiceText(lang, person, activeLevel)),
+        );
+      });
+      body.append(choices);
+    }
+
+    root.append(body);
   }
 
   function handleChoice(person) {
     attempts += 1;
     responseTimes.push(Date.now() - roundStart);
-    if (person.id === current.target.id) {
+    if (person.id === current().target.id) {
       correctCount += 1;
       speak(t(lang, "nice"));
     } else {
       speak(t(lang, "tryAgain"));
     }
     roundIndex += 1;
-    if (roundIndex >= totalRounds) {
+    if (roundIndex >= rounds.length) {
       finish();
       return;
     }
-    current = buildFaceNameRound(activeLevel, lang);
     roundStart = Date.now();
-    speak(t(lang, "faceHelp"));
+    speakRound();
     render();
   }
 

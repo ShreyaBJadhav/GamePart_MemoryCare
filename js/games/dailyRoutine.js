@@ -1,4 +1,4 @@
-import { el, clear, header, summaryView } from "../ui.js";
+import { el, clear, header, summaryView, levelSubtitle } from "../ui.js";
 import { t } from "../i18n.js";
 import { speak } from "../voice.js";
 import { applyAdaptiveAndSave, GAME_TYPES } from "../db.js";
@@ -28,7 +28,7 @@ export function mountDailyRoutine(root, { lang, level, onHome }) {
     root.append(
       header(lang, {
         title: t(lang, "routineName"),
-        subtitle: `${t(lang, "level")} ${activeLevel}`,
+        subtitle: levelSubtitle(lang, activeLevel),
         onBack: onHome,
       }),
     );

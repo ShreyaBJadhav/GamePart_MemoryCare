@@ -1,21 +1,15 @@
-import { el, clear, header, summaryView } from "../ui.js";
+import { el, clear, header, summaryView, levelSubtitle } from "../ui.js";
 import { t } from "../i18n.js";
 import { speak } from "../voice.js";
 import { applyAdaptiveAndSave, GAME_TYPES } from "../db.js";
 import { clampLevel } from "../adaptive.js";
-
-const DIFFICULTY_LEVELS = {
-  1: { pairs: 2, columns: 2 },
-  2: { pairs: 3, columns: 3 },
-  3: { pairs: 4, columns: 4 },
-  4: { pairs: 6, columns: 4 },
-  5: { pairs: 8, columns: 4 },
-};
-
-const CARD_CONTENT_POOL = [
-  "🍎", "🍌", "🐘", "🐄", "🌸", "🥭", "🐐", "🦚",
-  "🍊", "🍇", "🐓", "🦋",
-];
+import {
+  nextPatternRound,
+  getShapeSet,
+  getEmojiSet,
+  getPhotoRound,
+  pickPoolItems,
+} from "../content/patternMatchingContent.js";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -26,21 +20,97 @@ function shuffle(arr) {
   return a;
 }
 
-function buildDeck(level) {
-  const { pairs } = DIFFICULTY_LEVELS[level];
-  const chosen = shuffle(CARD_CONTENT_POOL).slice(0, pairs);
-  const pairContent = shuffle([...chosen, ...chosen]);
-  return pairContent.map((content, i) => ({
-    id: `card_${i}`,
-    content,
-    isFlipped: false,
-    isMatched: false,
-  }));
+function shapeSvg(shape) {
+  const fill = "#D85A30";
+  let inner = "";
+  if (shape === "circle") inner = `<circle cx="50" cy="50" r="38" fill="${fill}" />`;
+  else if (shape === "square") inner = `<rect x="16" y="16" width="68" height="68" rx="8" fill="${fill}" />`;
+  else if (shape === "rectangle") inner = `<rect x="10" y="28" width="80" height="44" rx="8" fill="${fill}" />`;
+  else if (shape === "star") inner = `<polygon points="50,8 61,38 94,38 67,58 78,90 50,70 22,90 33,58 6,38 39,38" fill="${fill}" />`;
+  else if (shape === "pentagon") inner = `<polygon points="50,8 92,38 76,88 24,88 8,38" fill="${fill}" />`;
+  else inner = `<polygon points="50,12 90,86 10,86" fill="${fill}" />`;
+  const box = el("div");
+  box.innerHTML = `<svg width="64" height="64" viewBox="0 0 100 100" aria-hidden="true">${inner}</svg>`;
+  return box.firstElementChild;
+}
+
+function buildDeck(level, roundIndex) {
+  if (level === 1) {
+    const shapes = getShapeSet(roundIndex);
+    const pairContent = shuffle([...shapes, ...shapes]);
+    return {
+      columns: 3,
+      cards: pairContent.map((shape, i) => ({
+        id: `card_${i}`,
+        pairId: shape,
+        kind: "shape",
+        shape,
+        isFlipped: false,
+        isMatched: false,
+      })),
+    };
+  }
+
+  if (level === 2) {
+    const emojis = getEmojiSet(roundIndex);
+    const pairContent = shuffle([...emojis, ...emojis]);
+    return {
+      columns: 3,
+      cards: pairContent.map((emoji, i) => ({
+        id: `card_${i}`,
+        pairId: emoji,
+        kind: "emoji",
+        emoji,
+        isFlipped: false,
+        isMatched: false,
+      })),
+    };
+  }
+
+  const spec = getPhotoRound(level, roundIndex);
+  const items = pickPoolItems(spec.category, spec.pairs, spec.offset);
+  const faces = [];
+  items.forEach((item) => {
+    if (level === 3) {
+      faces.push({ pairId: item.name, kind: "image", image: item.image, label: item.name });
+      faces.push({ pairId: item.name, kind: "image", image: item.image, label: item.name });
+    } else {
+      faces.push({ pairId: item.name, kind: "word", label: item.name });
+      faces.push({ pairId: item.name, kind: "image", image: item.image, label: item.name });
+    }
+  });
+  const shuffled = shuffle(faces);
+  const count = shuffled.length;
+  const columns = count === 10 ? 5 : 4;
+  return {
+    columns,
+    cards: shuffled.map((face, i) => ({
+      id: `card_${i}`,
+      ...face,
+      isFlipped: false,
+      isMatched: false,
+    })),
+  };
+}
+
+function faceContent(card) {
+  if (card.kind === "shape") return shapeSvg(card.shape);
+  if (card.kind === "emoji") return el("span", { className: "card-emoji" }, card.emoji);
+  if (card.kind === "word") return el("span", { className: "card-word" }, card.label);
+  if (card.kind === "image") {
+    return el("img", {
+      className: "card-photo",
+      src: card.image,
+      alt: card.label,
+    });
+  }
+  return "";
 }
 
 export function mountPatternMatching(root, { lang, level, onHome }) {
   const activeLevel = clampLevel(level);
-  let cards = buildDeck(activeLevel);
+  const roundIndex = nextPatternRound(activeLevel);
+  let { columns, cards } = buildDeck(activeLevel, roundIndex);
   let flipped = [];
   let busy = false;
   let attempts = 0;
@@ -62,7 +132,7 @@ export function mountPatternMatching(root, { lang, level, onHome }) {
     root.append(
       header(lang, {
         title: t(lang, "patternName"),
-        subtitle: `${t(lang, "level")} ${activeLevel}`,
+        subtitle: levelSubtitle(lang, activeLevel),
         onBack: onHome,
       }),
     );
@@ -71,16 +141,15 @@ export function mountPatternMatching(root, { lang, level, onHome }) {
       return;
     }
 
-    const { columns } = DIFFICULTY_LEVELS[activeLevel];
     const grid = el("div", { className: "grid", style: { gridTemplateColumns: `repeat(${columns}, 1fr)` } });
     cards.forEach((card, index) => {
       const show = card.isFlipped || card.isMatched;
       const btn = el("button", {
         className: `card-btn${show ? " face" : ""}${card.isMatched ? " matched" : ""}`,
         type: "button",
-        "aria-label": show ? `Card showing ${card.content}` : "Face-down card",
+        "aria-label": show ? `Card showing ${card.label || card.emoji || card.shape}` : "Face-down card",
         onClick: () => handleTap(index),
-      }, show ? el("span", { className: "card-emoji" }, card.content) : "?");
+      }, show ? faceContent(card) : "?");
       grid.append(btn);
     });
 
@@ -111,7 +180,7 @@ export function mountPatternMatching(root, { lang, level, onHome }) {
   function checkMatch() {
     busy = true;
     const [i1, i2] = flipped;
-    const isMatch = cards[i1].content === cards[i2].content;
+    const isMatch = cards[i1].pairId === cards[i2].pairId;
     if (lastFlipTime) {
       responseTimes.push(Date.now() - lastFlipTime);
       lastFlipTime = null;

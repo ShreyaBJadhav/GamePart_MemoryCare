@@ -1,5 +1,12 @@
 export const MIN_LEVEL = 1;
-export const MAX_LEVEL = 5;
+export const MAX_LEVEL = 4;
+
+export const LEVEL_TIERS = {
+  1: "easy",
+  2: "easy",
+  3: "medium",
+  4: "hard",
+};
 
 // Calibrated so typical strong/weak play can actually cross the bars.
 // Previous values (fast ≤ 5s AND slow ≥ 9s, all three ANDed) put almost
@@ -15,6 +22,10 @@ export function clampLevel(level) {
   const n = Number(level);
   if (!Number.isFinite(n)) return MIN_LEVEL;
   return Math.min(MAX_LEVEL, Math.max(MIN_LEVEL, Math.round(n)));
+}
+
+export function levelTier(level) {
+  return LEVEL_TIERS[clampLevel(level)];
 }
 
 /**

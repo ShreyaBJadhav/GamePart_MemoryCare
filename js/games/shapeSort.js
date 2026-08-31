@@ -1,4 +1,4 @@
-import { el, clear, header, summaryView } from "../ui.js";
+import { el, clear, header, summaryView, levelSubtitle } from "../ui.js";
 import { t } from "../i18n.js";
 import { speak } from "../voice.js";
 import { applyAdaptiveAndSave, GAME_TYPES } from "../db.js";
@@ -20,10 +20,19 @@ function shapeSvg(shape, color) {
   else if (shape === "square") inner = `<rect x="16" y="16" width="68" height="68" rx="8" fill="${fill}" />`;
   else if (shape === "rectangle") inner = `<rect x="10" y="28" width="80" height="44" rx="8" fill="${fill}" />`;
   else if (shape === "star") inner = `<polygon points="50,8 61,38 94,38 67,58 78,90 50,70 22,90 33,58 6,38 39,38" fill="${fill}" />`;
+  else if (shape === "pentagon") inner = `<polygon points="50,8 92,38 76,88 24,88 8,38" fill="${fill}" />`;
   else inner = `<polygon points="50,12 90,86 10,86" fill="${fill}" />`;
   const box = el("div");
   box.innerHTML = `<svg width="72" height="72" viewBox="0 0 100 100" aria-hidden="true">${inner}</svg>`;
   return box.firstElementChild;
+}
+
+function tileContent(item) {
+  if (item.kind === "emoji") return el("span", { className: "sort-emoji" }, item.emoji);
+  if (item.kind === "object") {
+    return el("img", { className: "sort-photo", src: item.image, alt: item.label || "" });
+  }
+  return shapeSvg(item.shape, item.color);
 }
 
 export function mountShapeSort(root, { lang, level, onHome }) {
@@ -72,7 +81,7 @@ export function mountShapeSort(root, { lang, level, onHome }) {
     root.append(
       header(lang, {
         title: t(lang, "shapeName"),
-        subtitle: `${t(lang, "level")} ${activeLevel}`,
+        subtitle: levelSubtitle(lang, activeLevel),
         onBack: () => {
           if (timerId) clearInterval(timerId);
           onHome();
@@ -80,7 +89,7 @@ export function mountShapeSort(root, { lang, level, onHome }) {
       }),
     );
 
-    const cols = items.length <= 9 ? 3 : 4;
+    const cols = items.length >= 20 ? 5 : items.length >= 10 ? 5 : 4;
     const grid = el("div", { className: "sort-grid", style: { gridTemplateColumns: `repeat(${cols}, 1fr)` } });
     items.forEach((item) => {
       const found = foundIds.has(item.id);
@@ -89,7 +98,7 @@ export function mountShapeSort(root, { lang, level, onHome }) {
         className: `sort-item${found ? " selected correct" : ""}${wrongFlash ? " wrong" : ""}`,
         type: "button",
         onClick: () => handleTap(item),
-      }, shapeSvg(item.shape, item.color));
+      }, tileContent(item));
       grid.append(btn);
     });
 
@@ -163,7 +172,7 @@ export function mountShapeSort(root, { lang, level, onHome }) {
     speak(allTargetsFound() ? t(lang, "allFound") : t(lang, "wellDone"));
     clear(root);
     root.append(
-      header(lang, { title: t(lang, "shapeName"), subtitle: `${t(lang, "level")} ${activeLevel}`, onBack: onHome }),
+      header(lang, { title: t(lang, "shapeName"), subtitle: levelSubtitle(lang, activeLevel), onBack: onHome }),
       summaryView(lang, {
         level: activeLevel,
         accuracyPercent,

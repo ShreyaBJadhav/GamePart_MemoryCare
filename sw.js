@@ -13,7 +13,7 @@
  *   Navigations fall back to the cached index.html when offline.
  */
 
-const CACHE_NAME = "memorycare-v1";
+const CACHE_NAME = "memorycare-v4";
 
 const PRECACHE = [
   "./",
@@ -27,6 +27,7 @@ const PRECACHE = [
   "./js/voice.js",
   "./js/i18n.js",
   "./js/ui.js",
+  "./js/familyPeople.js",
   "./js/games/patternMatching.js",
   "./js/games/shapeSort.js",
   "./js/games/faceNameRecall.js",
@@ -34,10 +35,28 @@ const PRECACHE = [
   "./js/content/shapeSortContent.js",
   "./js/content/faceNameContent.js",
   "./js/content/dailyRoutineContent.js",
+  "./js/content/patternMatchingContent.js",
   "./vendor/dexie.min.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/M.png",
+  "./assets/food/momos.jpg",
+  "./assets/food/thukpa.jpg",
+  "./assets/food/pitha.jpg",
+  "./assets/food/khar.jpg",
+  "./assets/food/jadoh.jpg",
+  "./assets/food/bamboo-shoot-curry.jpg",
+  "./assets/food/fish-tenga.jpg",
+  "./assets/fruit/assam-orange.jpg",
+  "./assets/fruit/pineapple.jpg",
+  "./assets/fruit/litchi.jpg",
+  "./assets/fruit/passion-fruit.jpg",
+  "./assets/fruit/kiwi.jpg",
+  "./assets/fruit/star-fruit.jpg",
+  "./assets/objects/clock.jpg",
+  "./assets/objects/telephone.jpg",
+  "./assets/objects/chair.jpg",
+  "./assets/objects/book.jpg",
 ];
 
 self.addEventListener("install", (event) => {
