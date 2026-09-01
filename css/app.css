@@ -20,6 +20,8 @@ html,
 body {
   margin: 0;
   min-height: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   background: var(--cream);
   color: var(--text);
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -28,11 +30,19 @@ body {
 body {
   font-size: 20px;
   line-height: 1.4;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+#app {
+  min-height: 100dvh;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 button,
 select {
   font: inherit;
+  touch-action: manipulation;
 }
 
 button {
@@ -47,6 +57,7 @@ button {
   background: var(--terracotta);
   color: var(--white);
   padding: 16px;
+  padding-top: max(16px, env(safe-area-inset-top, 0px));
   text-align: center;
 }
 
@@ -68,6 +79,12 @@ button {
   justify-content: center;
   flex-wrap: wrap;
   margin-top: 12px;
+}
+
+.header-actions .btn {
+  flex: 1 1 140px;
+  min-width: 140px;
+  max-width: 280px;
 }
 
 .btn {
@@ -104,6 +121,7 @@ button {
 }
 
 .screen {
+  width: 100%;
   max-width: 560px;
   margin: 0 auto;
   padding: 24px 18px 40px;
@@ -164,8 +182,18 @@ button {
   width: 100%;
 }
 
+.grid.cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid.cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .card-btn {
   aspect-ratio: 1 / 1;
+  min-width: 0;
+  min-height: 72px;
   border-radius: 16px;
   border: 2px solid var(--border);
   background: var(--terracotta);
@@ -193,11 +221,12 @@ button {
 }
 
 .card-word {
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 700;
   color: #3b3b3f;
   padding: 6px;
   line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .sort-grid {
@@ -206,8 +235,18 @@ button {
   margin-bottom: 18px;
 }
 
+.sort-grid.cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.sort-grid.cols-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
 .sort-item {
   aspect-ratio: 1 / 1;
+  min-width: 0;
+  min-height: 64px;
   border-radius: 16px;
   border: 4px solid var(--border);
   background: var(--peach);
@@ -261,8 +300,8 @@ button {
 }
 
 .face-stage {
-  width: 200px;
-  height: 200px;
+  width: min(200px, 42vw);
+  height: min(200px, 42vw);
   margin: 0 auto 22px;
   border-radius: 50%;
   background: var(--peach);
@@ -305,13 +344,17 @@ button {
 
 .family-row {
   display: grid;
-  grid-template-columns: 64px 1fr auto;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
   background: var(--white);
   border: 2px solid var(--border);
   border-radius: 14px;
   padding: 8px;
+}
+
+.family-row strong {
+  overflow-wrap: anywhere;
 }
 
 .family-thumb {
@@ -332,38 +375,15 @@ button {
   background: var(--white);
 }
 
-.routine-list {
-  display: grid;
-  gap: 10px;
-}
-
-.routine-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px;
-  align-items: center;
+.story-card {
   background: var(--white);
   border: 2px solid var(--border);
-  border-radius: 14px;
-  padding: 10px;
-}
-
-.routine-label {
-  font-size: 18px;
-  font-weight: 600;
-  text-align: left;
-}
-
-.move-btns {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.move-btns .btn {
-  min-height: 44px;
-  padding: 8px 14px;
-  font-size: 16px;
+  border-radius: 16px;
+  padding: 20px 18px;
+  font-size: 20px;
+  line-height: 1.55;
+  color: var(--text);
+  margin: 0 0 22px;
 }
 
 .summary {
@@ -382,8 +402,13 @@ button {
 .summary-row {
   display: flex;
   justify-content: space-between;
+  gap: 12px;
   padding: 10px 0;
   border-bottom: 1px solid var(--divider);
+}
+
+.summary-row span {
+  overflow-wrap: anywhere;
 }
 
 .timer {
@@ -406,4 +431,150 @@ button {
 
 .feedback.miss {
   color: var(--miss);
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 18px;
+  }
+
+  .app-header h1 {
+    font-size: 22px;
+  }
+
+  .screen {
+    padding: 16px 14px 32px;
+  }
+
+  .btn {
+    min-height: 52px;
+    padding: 14px 18px;
+    font-size: 18px;
+  }
+
+  .choice-btn {
+    min-height: 64px;
+    font-size: 20px;
+    padding: 16px 18px;
+  }
+
+  .grid.cols-4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sort-grid.cols-4,
+  .sort-grid.cols-5 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .face-option-grid {
+    gap: 10px;
+  }
+
+  .face-option-btn {
+    min-height: 120px;
+  }
+
+  .story-card {
+    font-size: 18px;
+    padding: 16px 14px;
+  }
+}
+
+@media (min-width: 768px) {
+  body {
+    font-size: 22px;
+  }
+
+  .screen {
+    max-width: 680px;
+    padding: 28px 24px 48px;
+  }
+
+  .app-header h1 {
+    font-size: 30px;
+  }
+
+  .game-card {
+    padding: 24px 22px;
+  }
+
+  .game-card strong {
+    font-size: 24px;
+  }
+
+  .home-grid {
+    gap: 16px;
+  }
+
+  .btn {
+    min-height: 60px;
+  }
+
+  .card-btn,
+  .sort-item {
+    min-height: 88px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .screen {
+    max-width: 760px;
+  }
+
+  .home-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .sort-grid.cols-5 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 400px) {
+  .sort-grid.cols-4,
+  .sort-grid.cols-5 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .app-header {
+    padding: 8px 12px;
+    padding-top: max(8px, env(safe-area-inset-top, 0px));
+  }
+
+  .app-header h1 {
+    font-size: 20px;
+  }
+
+  .app-header p {
+    margin: 4px 0 0;
+    font-size: 14px;
+  }
+
+  .header-actions {
+    margin-top: 8px;
+  }
+
+  .screen {
+    padding: 12px 16px 24px;
+  }
+
+  .instruction {
+    margin-bottom: 12px;
+  }
+
+  .face-stage {
+    width: 112px;
+    height: 112px;
+    margin-bottom: 12px;
+  }
+
+  .card-btn,
+  .sort-item {
+    min-height: 56px;
+  }
 }

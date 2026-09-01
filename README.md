@@ -39,7 +39,7 @@ After the first load, the app makes no network calls at runtime.
 1. **Pattern Matching** — card-flip memory match
 2. **Shape Sort** — selective-attention task ("tap all the circles" / "tap all the orange shapes")
 3. **Face-Name Recall** — unlabeled face, pick `"Name (Relationship)"` from 4 choices
-4. **My Daily Routine** — reorder shuffled daily activities (tap Up / Down, not drag)
+4. **Remember My Story** — listen to a story, then answer multiple-choice questions (all must be correct to complete)
 
 Each game has 5 difficulty levels along pair count, sequence length, distractor count, and time pressure.
 
@@ -62,7 +62,7 @@ New `game_results` rows always start with `sync_status: "PENDING"`. Nothing in t
 
 1. Open the app once over `http://` so the service worker can install
 2. DevTools → Application → Service Workers — one worker, **activated**
-3. Network → Offline, then refresh — all 4 games still load
+3. Network → Offline, then refresh — all games still load
 4. Application → IndexedDB → `game_results` — each record has `sync_status: "PENDING"`
 5. Application → Manifest — cream `#FDF6EC` / terracotta `#D85A30`, icons present
 

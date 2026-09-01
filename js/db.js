@@ -6,7 +6,7 @@ export const GAME_TYPES = {
   pattern_matching: "pattern_matching",
   shape_sort: "shape_sort",
   face_name_recall: "face_name_recall",
-  daily_routine: "daily_routine",
+  remember_my_story: "remember_my_story",
 };
 
 if (typeof Dexie === "undefined") {

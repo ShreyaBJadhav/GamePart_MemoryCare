@@ -5,14 +5,14 @@ import { ensurePatient, getLanguage, setLanguage, getPlayLevel, GAME_TYPES } fro
 import { mountPatternMatching } from "./games/patternMatching.js";
 import { mountShapeSort } from "./games/shapeSort.js";
 import { mountFaceNameRecall } from "./games/faceNameRecall.js";
-import { mountDailyRoutine } from "./games/dailyRoutine.js";
+import { mountRememberMyStory } from "./games/rememberMyStory.js";
 import { mountFamilyPhotos } from "./familyPeople.js";
 
 const GAMES = [
   { id: GAME_TYPES.pattern_matching, nameKey: "patternName", blurbKey: "patternBlurb", mount: mountPatternMatching },
   { id: GAME_TYPES.shape_sort, nameKey: "shapeName", blurbKey: "shapeBlurb", mount: mountShapeSort },
   { id: GAME_TYPES.face_name_recall, nameKey: "faceName", blurbKey: "faceBlurb", mount: mountFaceNameRecall },
-  { id: GAME_TYPES.daily_routine, nameKey: "routineName", blurbKey: "routineBlurb", mount: mountDailyRoutine },
+  { id: GAME_TYPES.remember_my_story, nameKey: "storyName", blurbKey: "storyBlurb", mount: mountRememberMyStory },
 ];
 
 let homeIntroSpoken = false;

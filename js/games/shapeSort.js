@@ -90,7 +90,7 @@ export function mountShapeSort(root, { lang, level, onHome }) {
     );
 
     const cols = items.length >= 20 ? 5 : items.length >= 10 ? 5 : 4;
-    const grid = el("div", { className: "sort-grid", style: { gridTemplateColumns: `repeat(${cols}, 1fr)` } });
+    const grid = el("div", { className: `sort-grid cols-${cols}` });
     items.forEach((item) => {
       const found = foundIds.has(item.id);
       const wrongFlash = lastWrongId === item.id;

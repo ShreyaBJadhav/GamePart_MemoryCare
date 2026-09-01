@@ -3,7 +3,7 @@
  *
  * Caching strategy (cache-first for the whole static shell):
  * - INSTALL: precache every HTML/CSS/JS/icon/manifest file needed to play
- *   all four games with zero network after the first successful load.
+ *   all games with zero network after the first successful load.
  * - ACTIVATE: delete any cache whose name is not the current versioned
  *   cache (memorycare-v1, memorycare-v2, …) so updates do not leave
  *   stale files behind.
@@ -13,7 +13,7 @@
  *   Navigations fall back to the cached index.html when offline.
  */
 
-const CACHE_NAME = "memorycare-v4";
+const CACHE_NAME = "memorycare-v8";
 
 const PRECACHE = [
   "./",
@@ -31,11 +31,11 @@ const PRECACHE = [
   "./js/games/patternMatching.js",
   "./js/games/shapeSort.js",
   "./js/games/faceNameRecall.js",
-  "./js/games/dailyRoutine.js",
+  "./js/games/rememberMyStory.js",
   "./js/content/shapeSortContent.js",
   "./js/content/faceNameContent.js",
-  "./js/content/dailyRoutineContent.js",
   "./js/content/patternMatchingContent.js",
+  "./js/content/storyContent.js",
   "./vendor/dexie.min.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",

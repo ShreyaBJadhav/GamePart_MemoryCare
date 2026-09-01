@@ -141,7 +141,7 @@ export function mountPatternMatching(root, { lang, level, onHome }) {
       return;
     }
 
-    const grid = el("div", { className: "grid", style: { gridTemplateColumns: `repeat(${columns}, 1fr)` } });
+    const grid = el("div", { className: `grid cols-${columns}` });
     cards.forEach((card, index) => {
       const show = card.isFlipped || card.isMatched;
       const btn = el("button", {
