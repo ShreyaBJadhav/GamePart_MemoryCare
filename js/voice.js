@@ -1,6 +1,9 @@
 const LANG_MAP = {
   en: "en-IN",
   hi: "hi-IN",
+  as: "as-IN",
+  bn: "bn-IN",
+  mni: "mni-IN",
 };
 
 let currentLang = "en";
@@ -11,7 +14,7 @@ let speakTimer = 0;
 let resumeWatch = 0;
 
 export function setVoiceLang(lang) {
-  currentLang = lang === "hi" ? "hi" : "en";
+  currentLang = Object.prototype.hasOwnProperty.call(LANG_MAP, lang) ? lang : "en";
 }
 
 export function getVoiceLang() {
@@ -35,7 +38,7 @@ function pickVoice() {
   const voices = window.speechSynthesis.getVoices() || [];
   if (!voices.length) return null;
   const wanted = LANG_MAP[currentLang];
-  const prefix = currentLang === "hi" ? "hi" : "en";
+  const prefix = currentLang.slice(0, 2);
   return (
     voices.find((v) => v.lang === wanted)
     || voices.find((v) => (v.lang || "").toLowerCase().startsWith(prefix))
@@ -111,6 +114,15 @@ export function speak(text) {
     speakTimer = 0;
     startUtterance(lastSpokenText, generation);
   }, 80);
+}
+
+export function speakSequence(texts) {
+  const sequence = texts
+    .filter((text) => text != null)
+    .map((text) => String(text).trim())
+    .filter(Boolean)
+    .join(" ");
+  if (sequence) speak(sequence);
 }
 
 export function repeatLast() {

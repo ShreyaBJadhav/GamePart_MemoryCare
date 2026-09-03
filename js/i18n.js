@@ -11,6 +11,7 @@ const STRINGS = {
     chooseLanguage: "Choose your language",
     chooseLanguageHelp: "Pick a language to continue",
     changeLanguage: "Change language",
+    settings: "Settings",
     repeat: "🔊 Repeat",
     back: "Back",
     playAgain: "Play Again",
@@ -80,6 +81,7 @@ const STRINGS = {
     chooseLanguage: "अपनी भाषा चुनें",
     chooseLanguageHelp: "आगे बढ़ने के लिए एक भाषा चुनें",
     changeLanguage: "भाषा बदलें",
+    settings: "सेटिंग्स",
     appTag: "आज के लिए कुछ शांत गतिविधियाँ",
     repeat: "🔊 दोहराएं",
     back: "वापस जाएं",
@@ -101,8 +103,6 @@ const STRINGS = {
     shapeBlurb: "नियम से मेल खाने वाली हर वस्तु पर टैप करें",
     faceName: "चेहरा और नाम",
     faceBlurb: "चेहरा देखें और सही नाम चुनें",
-    // storyName/storyBlurb/storyHelp/storyContinue/storyQuestionOf were missing from the
-    // newer Hindi source file — carried over from the original hi block, which already had them.
     storyName: "मेरी कहानी याद रखें",
     storyBlurb: "कहानी सुनें, फिर सवालों के जवाब दें",
     storyHelp: "कहानी पढ़ें और सुनें, फिर आगे बढ़ें।",
@@ -152,6 +152,7 @@ const STRINGS = {
     chooseLanguage: "আপোনাৰ ভাষা বাছনি কৰক",
     chooseLanguageHelp: "আগবাঢ়িবলৈ এটা ভাষা বাছনি কৰক",
     changeLanguage: "ভাষা সলনি কৰক",
+    settings: "ছেটিংছ",
     appTag: "আজিৰ বাবে কেইটামান শান্তিপূৰ্ণ কাৰ্যসূচী",
     repeat: "🔊 পুনৰ শুনক",
     back: "উভতি যাওক",
@@ -173,8 +174,6 @@ const STRINGS = {
     shapeBlurb: "নিয়মৰ সৈতে মিলা প্ৰতিটো বস্তুত টেপ কৰক",
     faceName: "মুখ আৰু নাম",
     faceBlurb: "মুখখন চাওক আৰু নামটো বাছনি কৰক",
-    // DRAFT — moderate confidence (Assamese is a lower-resource language). Worth a quick
-    // native-speaker glance before final use, same as the rest of the app's Assamese content.
     storyName: "মোৰ কাহিনী মনত ৰাখো",
     storyBlurb: "এটা কাহিনী শুনক, তাৰপিছত প্ৰশ্নবোৰৰ উত্তৰ দিয়ক",
     storyHelp: "কাহিনীটো পঢ়ক আৰু শুনক, তাৰপিছত আগবাঢ়ক।",
@@ -224,6 +223,7 @@ const STRINGS = {
     chooseLanguage: "আপনার ভাষা নির্বাচন করুন",
     chooseLanguageHelp: "এগিয়ে যেতে একটি ভাষা বেছে নিন",
     changeLanguage: "ভাষা পরিবর্তন করুন",
+    settings: "সেটিংস",
     appTag: "আজকের জন্য কিছু শান্ত কার্যক্রম",
     repeat: "🔊 পুনরাবৃত্তি",
     back: "ফিরে যান",
@@ -245,8 +245,6 @@ const STRINGS = {
     shapeBlurb: "নিয়মের সাথে মেলে এমন প্রতিটি আইটেমে ট্যাপ করুন",
     faceName: "মুখ এবং নাম",
     faceBlurb: "মুখ দেখে সঠিক নামটি বেছে নিন",
-    // DRAFT — Bengali is well-resourced, higher confidence than Assamese/Manipuri, but
-    // still worth a quick skim since this is health-context content.
     storyName: "আমার গল্প মনে রাখো",
     storyBlurb: "একটি গল্প শুনুন, তারপর প্রশ্নের উত্তর দিন",
     storyHelp: "গল্পটি পড়ুন এবং শুনুন, তারপর এগিয়ে যান।",
@@ -296,6 +294,7 @@ const STRINGS = {
     chooseLanguage: "নহাকগী লোন খনবীয়ু",
     chooseLanguageHelp: "মখা তানবা লোন অমা খনবীয়ু",
     changeLanguage: "লোন হোংদোকপীয়ু",
+    settings: "সেটিংস",
     appTag: "ঙসিগী ওইনা তপ্না পাংথোকফম থৌরম খর",
     repeat: "🔊 অমুক হন্না হায়বীয়ু",
     back: "হল্লকপীয়ু",
@@ -318,9 +317,9 @@ const STRINGS = {
     faceName: "মাইথোং অমসুং মমিং",
     faceBlurb: "মাইথোং য়েংশিনবা অমসুং মমিং খনবীয়ু",
     // PLACEHOLDER — NOT translated. Manipuri is the lowest-confidence language in this
-    // project for AI-assisted translation; these 5 keys were only just discovered missing
-    // from your source file and were deliberately left blank rather than guessed.
-    // Please provide real Manipuri text for these 5 keys before shipping.
+    // project for AI-assisted translation; these 5 keys are deliberately left as placeholders
+    // rather than guessed. The t() function below now falls back to English for these,
+    // so the app is functional in the meantime — but real Manipuri text is still needed here.
     storyName: "[MANIPURI TRANSLATION NEEDED]",
     storyBlurb: "[MANIPURI TRANSLATION NEEDED]",
     storyHelp: "[MANIPURI TRANSLATION NEEDED]",
@@ -360,12 +359,25 @@ const STRINGS = {
   },
 };
 
+/**
+ * Looks up a translation. Falls back to English (with a console warning) if:
+ * - the key doesn't exist for the requested language, or
+ * - the value is still a placeholder (contains "TRANSLATION NEEDED")
+ * If even English is missing the key, returns a visible [key] marker so the
+ * gap is obvious during testing rather than silently blank.
+ */
 export function t(lang, key) {
   const pack = STRINGS[lang];
-  if (!pack || !Object.prototype.hasOwnProperty.call(pack, key) || String(pack[key]).includes("TRANSLATION NEEDED")) {
-    return missingTranslation(lang, key);
+  const hasKey = pack && Object.prototype.hasOwnProperty.call(pack, key);
+  const value = hasKey ? pack[key] : undefined;
+  const isPlaceholder = typeof value === "string" && value.includes("TRANSLATION NEEDED");
+
+  if (value === undefined || isPlaceholder) {
+    console.warn(`Missing translation for key "${key}" in language "${lang}" — falling back to English.`);
+    const fallback = STRINGS.en[key];
+    return fallback !== undefined ? fallback : `[${key}]`;
   }
-  return pack[key];
+  return value;
 }
 
 export function missingTranslation(lang, key) {

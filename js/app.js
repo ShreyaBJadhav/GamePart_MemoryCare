@@ -39,6 +39,21 @@ async function showLanguageGate(root) {
   root.append(gate);
 }
 
+function showLanguageSettings(root, lang) {
+  clear(root);
+  const options = el("div", { className: "language-gate" });
+  for (const [language, label] of LANGUAGE_OPTIONS) {
+    options.append(el("button", {
+      className: "language-option", type: "button",
+      onClick: async () => { await setLanguage(language); await showHome(root); },
+    }, label));
+  }
+  root.append(
+    header(lang, { title: t(lang, "settings"), onBack: () => showHome(root) }),
+    options,
+  );
+}
+
 async function showHome(root) {
   const lang = await getLanguage();
   document.documentElement.lang = lang;
@@ -51,14 +66,6 @@ async function showHome(root) {
   clear(root);
   root.append(
     header(lang, { title: t(lang, "appTitle"), subtitle: t(lang, "appTag") }),
-  );
-
-  const langRow = el("div", { className: "lang-row", "aria-label": t(lang, "changeLanguage") },
-    ...LANGUAGE_OPTIONS.map(([language, label]) => el("button", {
-      className: `btn${lang === language ? " active" : ""}`,
-      type: "button",
-      onClick: async () => { await setLanguage(language); await showHome(root); },
-    }, label)),
   );
 
   const grid = el("div", { className: "home-grid" });
@@ -77,13 +84,19 @@ async function showHome(root) {
     );
   }
 
-  root.append(el("main", { className: "screen" }, langRow, grid,
+  root.append(el("main", { className: "screen" }, grid,
     el("button", {
       className: "btn",
       type: "button",
       style: { width: "100%", marginTop: "18px" },
       onClick: () => mountFamilyPhotos(root, { lang, onBack: () => showHome(root) }),
     }, t(lang, "familyPhotos")),
+    el("button", {
+      className: "btn",
+      type: "button",
+      style: { width: "100%", marginTop: "12px", background: "#3B3B3F" },
+      onClick: () => showLanguageSettings(root, lang),
+    }, t(lang, "settings")),
   ));
 }
 

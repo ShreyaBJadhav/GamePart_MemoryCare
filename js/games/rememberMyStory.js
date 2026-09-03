@@ -1,6 +1,6 @@
 import { el, clear, header, summaryView, levelSubtitle } from "../ui.js";
 import { t, tf, missingTranslation } from "../i18n.js";
-import { speak, setVoiceLang } from "../voice.js";
+import { speak, speakSequence, setVoiceLang } from "../voice.js";
 import { applyAdaptiveAndSave, GAME_TYPES } from "../db.js";
 import { clampLevel } from "../adaptive.js";
 import storyContent from "../content/storyContent.js";
@@ -50,8 +50,22 @@ export function mountRememberMyStory(root, { lang, level, onHome }) {
     mountRememberMyStory(root, { lang, level: resumeLevel, onHome });
   }
 
+  function speechForQuestion(index) {
+    const question = questions[index];
+    if (!question) return [];
+    return [
+      question.question,
+      ...question.options.map((option, optionIndex) =>
+        `Option ${String.fromCharCode(65 + optionIndex)}: ${option.text}`),
+    ];
+  }
+
+  function speakCurrentContext() {
+    speakSequence([story.text, ...speechForQuestion(questionIndex)]);
+  }
+
   setVoiceLang(lang);
-  speak(story.text);
+  speakCurrentContext();
   render();
 
   function render(complete = false, summary = null) {
@@ -109,7 +123,7 @@ export function mountRememberMyStory(root, { lang, level, onHome }) {
       return;
     }
     questionStart = Date.now();
-    speak(questions[questionIndex].question);
+    speakCurrentContext();
     render();
   }
 
