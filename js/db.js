@@ -1,6 +1,7 @@
 import { clampLevel, describeAdaptive } from "./adaptive.js";
 
 const DEFAULT_PATIENT_ID = 1;
+export const SUPPORTED_LANGUAGES = ["en", "hi", "as", "bn", "mni"];
 
 export const GAME_TYPES = {
   pattern_matching: "pattern_matching",
@@ -33,7 +34,7 @@ export async function ensurePatient() {
   if (!existing) {
     await db.patients.put({
       id: DEFAULT_PATIENT_ID,
-      language: "en",
+      language: null,
     });
   }
 
@@ -117,12 +118,13 @@ export async function deleteFamilyMember(id) {
 
 export async function getLanguage() {
   const patient = await db.patients.get(DEFAULT_PATIENT_ID);
-  return patient?.language === "hi" ? "hi" : "en";
+  return SUPPORTED_LANGUAGES.includes(patient?.language) ? patient.language : null;
 }
 
 export async function setLanguage(language) {
+  if (!SUPPORTED_LANGUAGES.includes(language)) throw new Error(`Unsupported language: ${language}`);
   await db.patients.update(DEFAULT_PATIENT_ID, {
-    language: language === "hi" ? "hi" : "en",
+    language,
   });
 }
 

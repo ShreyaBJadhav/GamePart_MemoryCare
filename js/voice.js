@@ -55,7 +55,9 @@ function startUtterance(text, generation) {
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = LANG_MAP[currentLang];
-  utterance.rate = 0.9;
+  utterance.rate = currentLang === "hi" ? 0.85 : 0.9;
+  utterance.pitch = currentLang === "hi" ? 1.05 : 1;
+  utterance.volume = 1;
   const voice = pickVoice();
   if (voice) utterance.voice = voice;
 

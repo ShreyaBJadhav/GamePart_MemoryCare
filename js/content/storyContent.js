@@ -1,3 +1,8 @@
+import assameseStoryContent from "./Assamese story.js";
+import bengaliStoryContent from "./Bengali story.js";
+import hindiStoryContent from "./Hindi story.js";
+import manipuriStoryContent from "./manipuri story.js";
+
 // storyContent.js
 // Content pool for "Remember My Story" game — NER-themed episodic memory/comprehension task.
 // Structure: storyContent[level] = array of story objects.
@@ -975,6 +980,46 @@ function replaceWords(text, map) {
   return out;
 }
 
+function applyHindiGrammarFixes(text) {
+  let out = String(text).trim();
+
+  out = out.replace(/(और\s+)?(वह|उसने)\s+दिया\s+(.+?)\s+को\s+(.+?)(?=[।!?]|$)/gi, (_, prefix = "", subject, object, person) => {
+    const lead = prefix ? `${prefix}${subject === "वह" ? "उसने" : subject}` : (subject === "वह" ? "उसने" : subject);
+    return `${lead} ${person} को ${object} दिया`;
+  });
+
+  out = out.replace(/(और\s+)?(वह|उसने)\s+दे\s+दिए\s+(.+?)\s+को\s+(.+?)(?=[।!?]|$)/gi, (_, prefix = "", subject, object, person) => {
+    const lead = prefix ? `${prefix}${subject === "वह" ? "उसने" : subject}` : (subject === "वह" ? "उसने" : subject);
+    return `${lead} ${person} को ${object} दे दिए`;
+  });
+
+  const fixes = [
+    [/(उसने)\s+खरीदे\s+(.+?)\s+और\s+(.+?)(?=[।!?]|$)/gi, "$1 $2 और $3 खरीदे"],
+    [/(उसने)\s+खरीदे\s+(.+?)(?=[।!?]|$)/gi, "$1 $2 खरीदे"],
+    [/(उसने)\s+बनाए\s+(.+?)(?=[।!?]|$)/gi, "$1 $2 बनाए"],
+    [/(उसने)\s+पकाए\s+(.+?)(?=[।!?]|$)/gi, "$1 $2 पकाए"],
+    [/(उसने)\s+लाए\s+(.+?)(?=[।!?]|$)/gi, "$1 $2 लाए"],
+    [/(उसने)\s+बाँटे\s+(.+?)(?=[।!?]|$)/gi, "$1 $2 बाँटे"],
+    [/(उसने)\s+दे\s+दिए\s+(.+?)(?=[।!?]|$)/gi, "$1 $2 दे दिए"],
+    [/(उसने)\s+दिया\s+(.+?)(?=[।!?]|$)/gi, "$1 $2 दिया"],
+    [/(उसने)\s+मिला\s+(.+?)(?=[।!?]|$)/gi, "$1 $2 से मिला"],
+    [/(उसने)\s+मुलाकात\s+की\s+(.+?)(?=[।!?]|$)/gi, "$1 $2 से मुलाकात की"],
+    [/(उसने)\s+देखा\s+(.+?)(?=[।!?]|$)/gi, "$1 $2 देखा"],
+    [/(और\s+)?दिया\s+(.+?)\s+को\s+(.+?)(?=[।!?]|$)/gi, "उसने $3 को $2 दिया"],
+    [/(और\s+)?दिए\s+(.+?)\s+को\s+(.+?)(?=[।!?]|$)/gi, "उसने $3 को $2 दिए"],
+  ];
+
+  for (const [pattern, replacement] of fixes) {
+    out = out.replace(pattern, replacement);
+  }
+
+  return out
+    .replace(/\s+/g, " ")
+    .replace(/\s([,.!?])/g, "$1")
+    .replace(/([।!?])(?=\S)/g, "$1 ")
+    .trim();
+}
+
 function translateStoryText(text) {
   let out = String(text);
   SENTENCE_PATTERNS.forEach(([pattern, replacement]) => {
@@ -983,7 +1028,7 @@ function translateStoryText(text) {
   out = replaceWords(out, NAME_MAP);
   out = replaceWords(out, WORD_MAP);
   out = replaceWords(out, COMMON_WORD_MAP);
-  out = out.replace(/\s+/g, " ").replace(/\s([,.!?])/g, "$1").trim();
+  out = applyHindiGrammarFixes(out);
   return out;
 }
 
@@ -995,7 +1040,7 @@ function translateQuestionText(question) {
   out = replaceWords(out, NAME_MAP);
   out = replaceWords(out, WORD_MAP);
   out = replaceWords(out, COMMON_WORD_MAP);
-  out = out.replace(/\s+/g, " ").replace(/\s([,.!?])/g, "$1").trim();
+  out = applyHindiGrammarFixes(out);
   return out;
 }
 
@@ -1013,7 +1058,7 @@ function translateOptionText(option) {
     .replace(/\s+/g, " ")
     .replace(/\s([,.!?])/g, "$1")
     .trim();
-  return out;
+  return applyHindiGrammarFixes(out);
 }
 
 function buildHindiStoryContent(content) {
@@ -1470,7 +1515,10 @@ const englishStoryContent = {
 
 const storyContent = {
   en: englishStoryContent,
-  hi: buildHindiStoryContent(englishStoryContent),
+  hi: hindiStoryContent,
+  as: assameseStoryContent,
+  bn: bengaliStoryContent,
+  mni: manipuriStoryContent,
 };
 
 export default storyContent;

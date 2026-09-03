@@ -9,6 +9,7 @@ import {
   getEmojiSet,
   getPhotoRound,
   pickPoolItems,
+  localizePatternItem,
 } from "../content/patternMatchingContent.js";
 
 function shuffle(arr) {
@@ -34,7 +35,7 @@ function shapeSvg(shape) {
   return box.firstElementChild;
 }
 
-function buildDeck(level, roundIndex) {
+function buildDeck(level, roundIndex, lang) {
   if (level === 1) {
     const shapes = getShapeSet(roundIndex);
     const pairContent = shuffle([...shapes, ...shapes]);
@@ -72,11 +73,11 @@ function buildDeck(level, roundIndex) {
   const faces = [];
   items.forEach((item) => {
     if (level === 3) {
-      faces.push({ pairId: item.name, kind: "image", image: item.image, label: item.name });
-      faces.push({ pairId: item.name, kind: "image", image: item.image, label: item.name });
+      faces.push({ pairId: item.name, kind: "image", image: item.image, label: localizePatternItem(item, lang) });
+      faces.push({ pairId: item.name, kind: "image", image: item.image, label: localizePatternItem(item, lang) });
     } else {
-      faces.push({ pairId: item.name, kind: "word", label: item.name });
-      faces.push({ pairId: item.name, kind: "image", image: item.image, label: item.name });
+      faces.push({ pairId: item.name, kind: "word", label: localizePatternItem(item, lang) });
+      faces.push({ pairId: item.name, kind: "image", image: item.image, label: localizePatternItem(item, lang) });
     }
   });
   const shuffled = shuffle(faces);
@@ -110,7 +111,7 @@ function faceContent(card) {
 export function mountPatternMatching(root, { lang, level, onHome }) {
   const activeLevel = clampLevel(level);
   const roundIndex = nextPatternRound(activeLevel);
-  let { columns, cards } = buildDeck(activeLevel, roundIndex);
+  let { columns, cards } = buildDeck(activeLevel, roundIndex, lang);
   let flipped = [];
   let busy = false;
   let attempts = 0;

@@ -1,5 +1,5 @@
 import { el, clear, header, summaryView, levelSubtitle } from "../ui.js";
-import { t } from "../i18n.js";
+import { t, missingTranslation } from "../i18n.js";
 import { speak } from "../voice.js";
 import { applyAdaptiveAndSave, GAME_TYPES } from "../db.js";
 import { clampLevel } from "../adaptive.js";
@@ -37,7 +37,7 @@ function tileContent(item) {
 
 export function mountShapeSort(root, { lang, level, onHome }) {
   const activeLevel = clampLevel(level);
-  const { spec, items, targetIds: targetIdList } = buildShapeSortRound(activeLevel);
+  const { spec, items, targetIds: targetIdList } = buildShapeSortRound(activeLevel, lang);
   const targetIds = new Set(targetIdList);
   const foundIds = new Set();
   let wrongTaps = 0;
@@ -55,7 +55,7 @@ export function mountShapeSort(root, { lang, level, onHome }) {
     mountShapeSort(root, { lang, level: resumeLevel, onHome });
   }
 
-  const instruction = spec.instruction[lang] || spec.instruction.en;
+  const instruction = spec.instruction;
   speak(instruction);
 
   if (spec.timeLimitMs) {
@@ -186,5 +186,7 @@ export function mountShapeSort(root, { lang, level, onHome }) {
 }
 
 function foundLabel(lang, found, total) {
-  return lang === "hi" ? `${found} / ${total} मिल गए` : `Found ${found} of ${total}`;
+  if (lang === "en") return `Found ${found} of ${total}`;
+  if (lang === "hi") return `${found} / ${total} मिल गए`;
+  return `${found} / ${total} ${missingTranslation(lang, "shape.foundLabel")}`;
 }

@@ -158,9 +158,29 @@ button {
 
 .lang-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
   margin-bottom: 22px;
+}
+
+.language-gate {
+  min-height: 100vh;
+  display: grid;
+  align-content: center;
+  gap: 16px;
+  padding: 24px;
+}
+
+.language-option {
+  width: 100%;
+  min-height: 72px;
+  border: 3px solid var(--terracotta);
+  border-radius: 16px;
+  background: var(--white);
+  color: var(--text);
+  font-size: 28px;
+  font-weight: 700;
 }
 
 .lang-row .btn {

@@ -15,15 +15,33 @@ const GAMES = [
   { id: GAME_TYPES.remember_my_story, nameKey: "storyName", blurbKey: "storyBlurb", mount: mountRememberMyStory },
 ];
 
+const LANGUAGE_OPTIONS = [
+  ["en", "English"], ["hi", "हिन्दी"], ["as", "অসমীয়া"], ["bn", "বাংলা"], ["mni", "ꯃꯤꯇꯩꯂꯣꯟ"],
+];
+
 let homeIntroSpoken = false;
 
 export async function startApp(root) {
   await ensurePatient();
-  await showHome(root);
+  if (await getLanguage()) await showHome(root);
+  else await showLanguageGate(root);
+}
+
+async function showLanguageGate(root) {
+  clear(root);
+  const gate = el("main", { className: "language-gate", role: "main" });
+  for (const [language, label] of LANGUAGE_OPTIONS) {
+    gate.append(el("button", {
+      className: "language-option", type: "button",
+      onClick: async () => { await setLanguage(language); await showHome(root); },
+    }, label));
+  }
+  root.append(gate);
 }
 
 async function showHome(root) {
   const lang = await getLanguage();
+  document.documentElement.lang = lang;
   setVoiceLang(lang);
   if (!homeIntroSpoken) {
     speak(t(lang, "appTag"));
@@ -35,23 +53,12 @@ async function showHome(root) {
     header(lang, { title: t(lang, "appTitle"), subtitle: t(lang, "appTag") }),
   );
 
-  const langRow = el("div", { className: "lang-row" },
-    el("button", {
-      className: `btn${lang === "en" ? " active" : ""}`,
+  const langRow = el("div", { className: "lang-row", "aria-label": t(lang, "changeLanguage") },
+    ...LANGUAGE_OPTIONS.map(([language, label]) => el("button", {
+      className: `btn${lang === language ? " active" : ""}`,
       type: "button",
-      onClick: async () => {
-        await setLanguage("en");
-        await showHome(root);
-      },
-    }, t(lang, "english")),
-    el("button", {
-      className: `btn${lang === "hi" ? " active" : ""}`,
-      type: "button",
-      onClick: async () => {
-        await setLanguage("hi");
-        await showHome(root);
-      },
-    }, t(lang, "hindi")),
+      onClick: async () => { await setLanguage(language); await showHome(root); },
+    }, label)),
   );
 
   const grid = el("div", { className: "home-grid" });

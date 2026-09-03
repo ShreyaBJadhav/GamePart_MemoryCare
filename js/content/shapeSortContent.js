@@ -1,3 +1,5 @@
+import { missingTranslation } from "../i18n.js";
+
 const SHAPES = ["circle", "square", "triangle", "rectangle", "star", "pentagon"];
 
 const EMOJIS = [
@@ -60,7 +62,7 @@ export function matchesRule(item, rule) {
   return false;
 }
 
-export function buildShapeSortRound(level) {
+export function buildShapeSortRound(level, lang) {
   const n = Number(level) || 1;
   const rounds = LEVEL_ROUNDS[n] || LEVEL_ROUNDS[1];
   const index = roundCursor[n] || 0;
@@ -69,7 +71,7 @@ export function buildShapeSortRound(level) {
   const rule = {
     kind: dim.target.kind,
     value: dim.target.value,
-    instruction: instructionFor(dim.target),
+    instruction: instructionFor(dim.target, lang),
   };
 
   const raw = [];
@@ -96,20 +98,19 @@ export function buildShapeSortRound(level) {
   };
 }
 
-function instructionFor(target) {
-  if (target.kind === "shape") return SHAPE_INSTRUCTIONS[target.value];
+function instructionFor(target, lang) {
+  if (target.kind === "shape") return localized(SHAPE_INSTRUCTIONS[target.value], lang, `shape.${target.value}`);
   if (target.kind === "emoji") {
     const row = EMOJIS.find((e) => e.value === target.value);
-    return {
-      en: `Tap all the ${row ? row.en : "matching items"}`,
-      hi: `सभी ${row ? row.hi : "मेल खाती चीज़ें"} छुएँ`,
-    };
+    return localized({ en: `Tap all the ${row ? row.en : "matching items"}`, hi: `सभी ${row ? row.hi : "मेल खाती चीज़ें"} छुएँ` }, lang, `emoji.${target.value}`);
   }
   const obj = OBJECT_ITEMS.find((o) => o.id === target.value);
-  return {
-    en: `Tap all the ${obj ? obj.en : "matching items"}`,
-    hi: `सभी ${obj ? obj.hi : "मेल खाती चीज़ें"} छुएँ`,
-  };
+  return localized({ en: `Tap all the ${obj ? obj.en : "matching items"}`, hi: `सभी ${obj ? obj.hi : "मेल खाती चीज़ें"} छुएँ` }, lang, `object.${target.value}`);
+}
+
+function localized(values, lang, key) {
+  if (values[lang]) return values[lang];
+  return missingTranslation(lang, key);
 }
 
 function makeTargetItem(rule) {

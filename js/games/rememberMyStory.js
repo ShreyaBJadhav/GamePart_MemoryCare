@@ -1,31 +1,35 @@
 import { el, clear, header, summaryView, levelSubtitle } from "../ui.js";
-import { t, tf } from "../i18n.js";
+import { t, tf, missingTranslation } from "../i18n.js";
 import { speak, setVoiceLang } from "../voice.js";
 import { applyAdaptiveAndSave, GAME_TYPES } from "../db.js";
 import { clampLevel } from "../adaptive.js";
 import storyContent from "../content/storyContent.js";
 
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 function pickStory(level, lang = "en") {
-  const poolSet = storyContent[lang] || storyContent.en;
-  const pool = poolSet[level] || poolSet[1] || storyContent.en[1];
-  return pool[Math.floor(Math.random() * pool.length)];
+  const poolSet = storyContent[lang];
+  if (!poolSet) {
+    return {
+      id: `missing-${lang}`,
+      text: missingTranslation(lang, "story.content"),
+      questions: [],
+    };
+  }
+  const pool = poolSet[level] || poolSet[1];
+  if (!pool) {
+    return {
+      id: `missing-${lang}-level-${level}`,
+      text: missingTranslation(lang, `story.level.${level}`),
+      questions: [],
+    };
+  }
+  const orderedPool = [...pool].sort((a, b) => a.id.localeCompare(b.id));
+  return orderedPool[0];
 }
 
 function prepareQuestions(story) {
   return story.questions.map((q) => ({
     question: q.question,
-    options: shuffle(
-      q.options.map((text, i) => ({ text, correct: i === q.correctIndex })),
-    ),
+    options: q.options.map((text, i) => ({ text, correct: i === q.correctIndex })),
   }));
 }
 
@@ -33,13 +37,12 @@ export function mountRememberMyStory(root, { lang, level, onHome }) {
   const activeLevel = clampLevel(level);
   const story = pickStory(activeLevel, lang);
   const questions = prepareQuestions(story);
-  let phase = "story";
   let questionIndex = 0;
   let attempts = 0;
   let mistakes = 0;
   const sessionStart = Date.now();
   const responseTimes = [];
-  let questionStart = 0;
+  let questionStart = Date.now();
   let resumeLevel = activeLevel;
   let finishing = false;
 
@@ -53,9 +56,7 @@ export function mountRememberMyStory(root, { lang, level, onHome }) {
 
   function render(complete = false, summary = null) {
     clear(root);
-    const subtitle = phase === "questions" && !complete
-      ? `${levelSubtitle(lang, activeLevel)} · ${tf(lang, "storyQuestionOf", { n: questionIndex + 1, total: questions.length })}`
-      : levelSubtitle(lang, activeLevel);
+    const subtitle = `${levelSubtitle(lang, activeLevel)} · ${tf(lang, "storyQuestionOf", { n: questionIndex + 1, total: questions.length })}`;
     root.append(
       header(lang, {
         title: t(lang, "storyName"),
@@ -65,22 +66,6 @@ export function mountRememberMyStory(root, { lang, level, onHome }) {
     );
     if (complete) {
       root.append(summaryView(lang, summary, { onRestart: restart, onHome }));
-      return;
-    }
-
-    if (phase === "story") {
-      root.append(
-        el("main", { className: "screen" },
-          el("p", { className: "instruction" }, t(lang, "storyHelp")),
-          el("p", { className: "story-card" }, story.text),
-          el("button", {
-            className: "btn",
-            type: "button",
-            style: { width: "100%", marginTop: "8px" },
-            onClick: startQuestions,
-          }, t(lang, "storyContinue")),
-        ),
-      );
       return;
     }
 
@@ -98,32 +83,26 @@ export function mountRememberMyStory(root, { lang, level, onHome }) {
 
     root.append(
       el("main", { className: "screen" },
+        el("p", { className: "instruction" }, t(lang, "storyHelp")),
+        el("p", { className: "story-card" }, story.text),
         el("p", { className: "instruction" }, q.question),
         choices,
       ),
     );
   }
 
-  function startQuestions() {
-    phase = "questions";
-    questionIndex = 0;
-    questionStart = Date.now();
-    setVoiceLang(lang);
-    speak(questions[0].question);
-    render();
-  }
-
   function handleChoice(option) {
-    if (finishing || phase !== "questions") return;
+    if (finishing) return;
     attempts += 1;
     responseTimes.push(Date.now() - questionStart);
     setVoiceLang(lang);
-    if (option.correct) {
-      speak(t(lang, "nice"));
-    } else {
+    if (!option.correct) {
       mistakes += 1;
       speak(t(lang, "tryAgain"));
+      render();
+      return;
     }
+    speak(t(lang, "nice"));
     questionIndex += 1;
     if (questionIndex >= questions.length) {
       finish();
@@ -139,8 +118,8 @@ export function mountRememberMyStory(root, { lang, level, onHome }) {
     finishing = true;
     const times = responseTimes;
     const avgResponseMs = times.length === 0 ? 0 : Math.round(times.reduce((a, b) => a + b, 0) / times.length);
-    const completed = mistakes === 0;
-    const accuracyPercent = completed ? 100 : 0;
+    const completed = true;
+    const accuracyPercent = attempts === 0 ? 100 : Math.round(((attempts - mistakes) / attempts) * 100);
     const totalTimeSeconds = Math.round((Date.now() - sessionStart) / 1000);
     const { nextPlayLevel } = await applyAdaptiveAndSave(GAME_TYPES.remember_my_story, {
       level: activeLevel,

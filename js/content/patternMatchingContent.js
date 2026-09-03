@@ -1,5 +1,6 @@
 // Pattern Matching content pools.
 // Add a new food by appending one object — no other code changes needed.
+import { missingTranslation } from "../i18n.js";
 
 export const FOOD_ITEMS = [
   { name: "Momos", image: "assets/food/momos.jpg" },
@@ -69,6 +70,11 @@ export function pickPoolItems(category, count, offset) {
     items.push(item);
   }
   return items;
+}
+
+export function localizePatternItem(item, lang) {
+  if (lang === "en") return item.name;
+  return missingTranslation(lang, `pattern.${item.name}`);
 }
 
 export function getShapeSet(roundIndex) {
