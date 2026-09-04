@@ -11,7 +11,8 @@ let lastSpokenText = "";
 let speakGeneration = 0;
 let activeUtterance = null;
 let speakTimer = 0;
-let resumeWatch = 0;
+let pausedByUser = false;
+let resumeFallbackTimer = 0;
 
 export function setVoiceLang(lang) {
   currentLang = Object.prototype.hasOwnProperty.call(LANG_MAP, lang) ? lang : "en";
@@ -19,19 +20,6 @@ export function setVoiceLang(lang) {
 
 export function getVoiceLang() {
   return currentLang;
-}
-
-function ensureResumeWatch() {
-  if (resumeWatch || !("speechSynthesis" in window)) return;
-  resumeWatch = window.setInterval(() => {
-    try {
-      if (window.speechSynthesis.speaking && window.speechSynthesis.paused) {
-        window.speechSynthesis.resume();
-      }
-    } catch {
-      /* ignore */
-    }
-  }, 250);
 }
 
 function pickVoice() {
@@ -46,13 +34,16 @@ function pickVoice() {
   );
 }
 
-function startUtterance(text, generation) {
+function startUtterance(text, generation, onend) {
   if (generation !== speakGeneration) return;
-  if (!("speechSynthesis" in window)) return;
+  if (!("speechSynthesis" in window)) {
+    if (onend) onend();
+    return;
+  }
 
   const voices = window.speechSynthesis.getVoices() || [];
   if (!voices.length) {
-    window.setTimeout(() => startUtterance(text, generation), 250);
+    window.setTimeout(() => startUtterance(text, generation, onend), 250);
     return;
   }
 
@@ -66,6 +57,7 @@ function startUtterance(text, generation) {
 
   utterance.onend = () => {
     if (activeUtterance === utterance) activeUtterance = null;
+    if (generation === speakGeneration && onend) onend();
   };
   utterance.onerror = () => {
     if (activeUtterance === utterance) activeUtterance = null;
@@ -80,16 +72,23 @@ function startUtterance(text, generation) {
   }
 }
 
-export function speak(text) {
+export function speak(text, onend = null) {
   if (text == null) return;
   const next = String(text).trim();
   if (!next) return;
 
   lastSpokenText = next;
-  if (!("speechSynthesis" in window)) return;
+  if (!("speechSynthesis" in window)) {
+    if (onend) onend();
+    return;
+  }
 
-  ensureResumeWatch();
   const generation = ++speakGeneration;
+  pausedByUser = false;
+  if (resumeFallbackTimer) {
+    window.clearTimeout(resumeFallbackTimer);
+    resumeFallbackTimer = 0;
+  }
   if (speakTimer) {
     window.clearTimeout(speakTimer);
     speakTimer = 0;
@@ -106,13 +105,13 @@ export function speak(text) {
     || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
   if (isiOS) {
-    startUtterance(lastSpokenText, generation);
+    startUtterance(lastSpokenText, generation, onend);
     return;
   }
 
   speakTimer = window.setTimeout(() => {
     speakTimer = 0;
-    startUtterance(lastSpokenText, generation);
+    startUtterance(lastSpokenText, generation, onend);
   }, 80);
 }
 
@@ -130,11 +129,48 @@ export function repeatLast() {
   speak(lastSpokenText);
 }
 
+export function isSpeechPaused() {
+  return pausedByUser;
+}
+
+export function toggleSpeaking() {
+  if (!("speechSynthesis" in window)) return false;
+  if (pausedByUser) {
+    pausedByUser = false;
+    try {
+      window.speechSynthesis.resume();
+    } catch {
+      /* ignore */
+    }
+    if (resumeFallbackTimer) window.clearTimeout(resumeFallbackTimer);
+    const phrase = lastSpokenText;
+    // Some Chrome versions accept resume() but stay silent; restart the phrase if that happens.
+    resumeFallbackTimer = window.setTimeout(() => {
+      resumeFallbackTimer = 0;
+      if (!window.speechSynthesis.speaking || window.speechSynthesis.paused) speak(phrase);
+    }, 1500);
+    return false;
+  }
+
+  pausedByUser = true;
+  try {
+    window.speechSynthesis.pause();
+  } catch {
+    /* ignore */
+  }
+  return true;
+}
+
 export function stopSpeaking() {
   ++speakGeneration;
+  pausedByUser = false;
   if (speakTimer) {
     window.clearTimeout(speakTimer);
     speakTimer = 0;
+  }
+  if (resumeFallbackTimer) {
+    window.clearTimeout(resumeFallbackTimer);
+    resumeFallbackTimer = 0;
   }
   activeUtterance = null;
 

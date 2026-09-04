@@ -135,6 +135,7 @@ export function mountPatternMatching(root, { lang, level, onHome }) {
         title: t(lang, "patternName"),
         subtitle: levelSubtitle(lang, activeLevel),
         onBack: onHome,
+        speechControls: true,
       }),
     );
     if (complete) {

@@ -160,13 +160,19 @@ button {
 }
 
 .home-card-detail { display: block; margin-top: 4px; font-size: 17px; font-weight: 400; }
-.breathing-home-btn { margin-top: 12px; background: #8a4a32; text-align: left; }
+.progress-home-btn,
+.breathing-home-btn { width: 100%; margin-top: 12px; text-align: left; }
+.breathing-home-btn { background: #8a4a32; }
 .breathing-screen { text-align: center; }
+.breathing-session-options { display: grid; gap: 14px; margin-top: 28px; }
+.breathing-instruction { max-width: 520px; margin-left: auto; margin-right: auto; font-size: 22px; line-height: 1.6; }
 .breathing-circle { width: min(72vw, 300px); aspect-ratio: 1; margin: 14px auto 24px; border-radius: 50%; display: grid; place-items: center; background: #e28364; border: 12px solid #d85a30; box-shadow: 0 0 0 18px #faece7; transition: transform 4s ease-in-out, background-color 4s ease-in-out; }
 .breathing-circle.breathing-in { transform: scale(1.08); background: #d85a30; transition-duration: 4s; }
-.breathing-circle.breathing-out { transform: scale(0.86); background: #e28364; transition-duration: 6s; }
+.breathing-circle.breathing-hold { transform: scale(1.08); background: #d85a30; transition: none; }
+.breathing-circle.breathing-out { transform: scale(0.86); background: #e28364; transition-duration: 8s; }
 .breathing-phase { margin: 0; color: #fff; font-size: 28px; font-weight: 700; }
-.breathing-stop { width: 100%; margin-top: 10px; background: #3b3b3f; }
+.breathing-controls { display: grid; gap: 10px; }
+.breathing-stop { width: 100%; background: #3b3b3f; }
 .breathing-stop:hover, .breathing-stop:focus-visible { background: #59595d; }
 .breathing-complete { display: grid; justify-items: center; gap: 18px; padding-top: 70px; text-align: center; }
 .breathing-complete h2, .breathing-complete p { margin: 0; }
@@ -270,6 +276,13 @@ button {
   padding: 6px;
   line-height: 1.2;
   overflow-wrap: anywhere;
+}
+
+.card-emoji {
+  display: block;
+  max-width: 100%;
+  font-size: 40px;
+  line-height: 1;
 }
 
 .sort-grid {

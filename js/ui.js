@@ -1,5 +1,5 @@
 import { t } from "./i18n.js";
-import { repeatLast, stopSpeaking } from "./voice.js";
+import { repeatLast, toggleSpeaking, isSpeechPaused } from "./voice.js";
 import { clampLevel, levelTier } from "./adaptive.js";
 
 export function levelSubtitle(lang, level) {
@@ -34,7 +34,7 @@ export function clear(node) {
   node.replaceChildren();
 }
 
-export function header(lang, { title, subtitle, onBack }) {
+export function header(lang, { title, subtitle, onBack, speechControls = false }) {
   return el("header", { className: "app-header" },
     el("h1", {}, title),
     subtitle ? el("p", {}, subtitle) : null,
@@ -42,10 +42,22 @@ export function header(lang, { title, subtitle, onBack }) {
       onBack
         ? el("button", { className: "btn btn-light", type: "button", onClick: onBack }, t(lang, "back"))
         : null,
-      el("button", { className: "btn btn-light", type: "button", onClick: repeatLast }, t(lang, "repeat")),
-      el("button", { className: "btn btn-light btn-stop", type: "button", onClick: stopSpeaking }, t(lang, "stop")),
+      speechControls ? el("button", { className: "btn btn-light", type: "button", onClick: repeatLast }, t(lang, "repeat")) : null,
+      speechControls ? speechToggle(lang) : null,
     ),
   );
+}
+
+function speechToggle(lang) {
+  const button = el("button", {
+    className: "btn btn-light",
+    type: "button",
+    onClick: () => {
+      toggleSpeaking();
+      button.textContent = t(lang, isSpeechPaused() ? "play" : "pause");
+    },
+  }, t(lang, isSpeechPaused() ? "play" : "pause"));
+  return button;
 }
 
 export function summaryView(lang, result, { onRestart, onHome }) {

@@ -76,6 +76,7 @@ export function mountRememberMyStory(root, { lang, level, onHome }) {
         title: t(lang, "storyName"),
         subtitle,
         onBack: onHome,
+        speechControls: true,
       }),
     );
     if (complete) {

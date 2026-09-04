@@ -1,6 +1,6 @@
 import { el, clear, header, summaryView, levelSubtitle } from "../ui.js";
 import { t } from "../i18n.js";
-import { speak } from "../voice.js";
+import { speak, speakSequence, setVoiceLang } from "../voice.js";
 import { applyAdaptiveAndSave, GAME_TYPES, listFamilyMembers } from "../db.js";
 import { clampLevel } from "../adaptive.js";
 import { buildFaceSession, choiceText } from "../content/faceNameContent.js";
@@ -35,6 +35,7 @@ export async function mountFaceNameRecall(root, { lang, level, onHome }) {
   const responseTimes = [];
   let roundStart = Date.now();
   let resumeLevel = activeLevel;
+  let answering = false;
 
   function restart() {
     mountFaceNameRecall(root, { lang, level: resumeLevel, onHome });
@@ -49,7 +50,11 @@ export async function mountFaceNameRecall(root, { lang, level, onHome }) {
 
   function speakRound() {
     const round = current();
-    if (round) speak(round.prompt);
+    if (round) speakSequence([
+      round.prompt,
+      ...round.choices.map((person, index) =>
+        `Option ${String.fromCharCode(65 + index)}: ${choiceText(lang, person, activeLevel)}`),
+    ]);
   }
 
   function render(complete = false, summary = null) {
@@ -59,6 +64,7 @@ export async function mountFaceNameRecall(root, { lang, level, onHome }) {
         title: t(lang, "faceName"),
         subtitle: `${levelSubtitle(lang, activeLevel)} · ${roundIndex + (complete ? 0 : 1)} / ${rounds.length}`,
         onBack: onHome,
+        speechControls: true,
       }),
     );
     if (complete) {
@@ -104,22 +110,26 @@ export async function mountFaceNameRecall(root, { lang, level, onHome }) {
   }
 
   function handleChoice(person) {
+    if (answering) return;
+    answering = true;
     attempts += 1;
     responseTimes.push(Date.now() - roundStart);
+    setVoiceLang(lang);
+    const feedback = person.id === current().target.id ? t(lang, "nice") : t(lang, "tryAgain");
     if (person.id === current().target.id) {
       correctCount += 1;
-      speak(t(lang, "nice"));
-    } else {
-      speak(t(lang, "tryAgain"));
     }
-    roundIndex += 1;
-    if (roundIndex >= rounds.length) {
-      finish();
-      return;
-    }
-    roundStart = Date.now();
-    speakRound();
-    render();
+    speak(feedback, () => {
+      roundIndex += 1;
+      if (roundIndex >= rounds.length) {
+        finish();
+        return;
+      }
+      answering = false;
+      roundStart = Date.now();
+      speakRound();
+      render();
+    });
   }
 
   async function finish() {

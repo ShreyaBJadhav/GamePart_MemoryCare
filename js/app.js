@@ -88,21 +88,21 @@ async function showHome(root) {
 
   root.append(el("main", { className: "screen" }, grid,
     el("button", {
-      className: "btn",
+      className: "btn breathing-home-btn",
       type: "button",
-      style: { width: "100%", marginTop: "18px" },
-      onClick: () => mountFamilyPhotos(root, { lang, onBack: () => showHome(root) }),
-    }, t(lang, "familyPhotos")),
+      onClick: () => mountBreathing(root, { lang, onHome: () => showHome(root) }),
+    }, t(lang, "breathingName"), el("span", { className: "home-card-detail" }, t(lang, "breathingBlurb"))),
     el("button", {
       className: "btn progress-home-btn",
       type: "button",
       onClick: () => mountProgress(root, { lang, onBack: () => showHome(root) }),
     }, t(lang, "myProgress")),
     el("button", {
-      className: "btn breathing-home-btn",
+      className: "btn",
       type: "button",
-      onClick: () => mountBreathing(root, { lang, onHome: () => showHome(root) }),
-    }, t(lang, "breathingName"), el("span", { className: "home-card-detail" }, t(lang, "breathingBlurb"))),
+      style: { width: "100%", marginTop: "18px" },
+      onClick: () => mountFamilyPhotos(root, { lang, onBack: () => showHome(root) }),
+    }, t(lang, "familyPhotos")),
     el("button", {
       className: "btn",
       type: "button",

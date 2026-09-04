@@ -3,30 +3,154 @@ import { missingTranslation } from "../i18n.js";
 const SHAPES = ["circle", "square", "triangle", "rectangle", "star", "pentagon"];
 
 const EMOJIS = [
-  { value: "🍎", en: "apples", hi: "सेब" },
-  { value: "🍌", en: "bananas", hi: "केले" },
-  { value: "🌸", en: "flowers", hi: "फूल" },
-  { value: "☂️", en: "umbrellas", hi: "छतरियाँ" },
-  { value: "⚽", en: "balls", hi: "गेंदें" },
-  { value: "🔑", en: "keys", hi: "चाबियाँ" },
-  { value: "☕", en: "cups", hi: "कप" },
-  { value: "🌙", en: "moons", hi: "चाँद" },
+  { 
+    value: "🍎", 
+    en: "apples", 
+    hi: "सेब", 
+    as: "আপেলবোৰ", 
+    bn: "আপেলগুলো", 
+    mni: "সেবশিং" 
+  },
+  { 
+    value: "🍌", 
+    en: "bananas", 
+    hi: "केले", 
+    as: "কলবোৰ", 
+    bn: "কলাগুলো", 
+    mni: "লফোইশিং" 
+  },
+  { 
+    value: "🌸", 
+    en: "flowers", 
+    hi: "फूल", 
+    as: "ফুলবোৰ", 
+    bn: "ফুলগুলো", 
+    mni: "লৈশিং" 
+  },
+  { 
+    value: "☂️", 
+    en: "umbrellas", 
+    hi: "छतरियाँ", 
+    as: "ছাতিবোৰ", 
+    bn: "ছাতাগুলো", 
+    mni: "শেকপিনশিং" 
+  },
+  { 
+    value: "⚽", 
+    en: "balls", 
+    hi: "गेंदें", 
+    as: "বলবোৰ", 
+    bn: "বলগুলো", 
+    mni: "বলশিং" 
+  },
+  { 
+    value: "🔑", 
+    en: "keys", 
+    hi: "चाबियाँ", 
+    as: "চাবিবোৰ", 
+    bn: "চাবিগুলো", 
+    mni: "সোবীশিং" 
+  },
+  { 
+    value: "☕", 
+    en: "cups", 
+    hi: "कप", 
+    as: "কাপবোৰ", 
+    bn: "কাপগুলো", 
+    mni: "খপশিং" 
+  },
+  { 
+    value: "🌙", 
+    en: "moons", 
+    hi: "चाँद", 
+    as: "জোনবোৰ", 
+    bn: "চাঁদগুলো", 
+    mni: "থাশিং" 
+  },
 ];
 
 export const OBJECT_ITEMS = [
-  { id: "clock", image: "assets/objects/clock.jpg", en: "clocks", hi: "घड़ियाँ" },
-  { id: "telephone", image: "assets/objects/telephone.jpg", en: "telephones", hi: "टेलीफ़ोन" },
-  { id: "chair", image: "assets/objects/chair.jpg", en: "chairs", hi: "कुर्सियाँ" },
-  { id: "book", image: "assets/objects/book.jpg", en: "books", hi: "किताबें" },
+  { 
+    id: "clock", 
+    image: "assets/objects/clock.jpg", 
+    en: "clocks", 
+    hi: "घड़ियाँ", 
+    as: "ঘড়ীবোৰ", 
+    bn: "ঘড়িগুলো", 
+    mni: "পুংগী ঘড়ীশিং" 
+  },
+  { 
+    id: "telephone", 
+    image: "assets/objects/telephone.jpg", 
+    en: "telephones", 
+    hi: "टेलीफ़ोन", 
+    as: "টেলিফোনবোৰ", 
+    bn: "টেলিফোনগুলো", 
+    mni: "তেলিফোনশিং" 
+  },
+  { 
+    id: "chair", 
+    image: "assets/objects/chair.jpg", 
+    en: "chairs", 
+    hi: "कुर्सियाँ", 
+    as: "চকীবোৰ", 
+    bn: "চেয়ারগুলো", 
+    mni: "চৌকিশিং" 
+  },
+  { 
+    id: "book", 
+    image: "assets/objects/book.jpg", 
+    en: "books", 
+    hi: "किताबें", 
+    as: "কিতাপবোৰ", 
+    bn: "বইগুলো", 
+    mni: "লাইরিকশিং" 
+  },
 ];
 
 const SHAPE_INSTRUCTIONS = {
-  circle: { en: "Tap all the circles", hi: "सभी गोल आकार छुएँ" },
-  square: { en: "Tap all the squares", hi: "सभी वर्ग छुएँ" },
-  triangle: { en: "Tap all the triangles", hi: "सभी त्रिभुज छुएँ" },
-  rectangle: { en: "Tap all the rectangles", hi: "सभी आयत छुएँ" },
-  star: { en: "Tap all the stars", hi: "सभी तारे छुएँ" },
-  pentagon: { en: "Tap all the pentagons", hi: "सभी पंचभुज छुएँ" },
+  circle: { 
+    en: "Tap all the circles", 
+    hi: "सभी गोल आकार छुएँ", 
+    as: "সকলো বৃত্ত স্পৰ্শ কৰক", 
+    bn: "সব বৃত্তগুলো স্পর্শ করুন", 
+    mni: "তেম্পাক পুম্নমক নাম্মু" 
+  },
+  square: { 
+    en: "Tap all the squares", 
+    hi: "सभी वर्ग छुएँ", 
+    as: "সকলো বৰ্গক্ষেত্ৰ স্পৰ্শ কৰক", 
+    bn: "সব বর্গক্ষেত্রগুলো স্পর্শ করুন", 
+    mni: "চাং চারি পুম্নমক নাম্মু" 
+  },
+  triangle: { 
+    en: "Tap all the triangles", 
+    hi: "सभी त्रिभुज छुएँ", 
+    as: "সকলো ত্ৰিভুজ স্পৰ্শ কৰক", 
+    bn: "সব ত্রিভুজগুলো স্পর্শ করুন", 
+    mni: "ত্রিকোণ পুম্নমক নাম্মু" 
+  },
+  rectangle: { 
+    en: "Tap all the rectangles", 
+    hi: "सभी आयत छुएँ", 
+    as: "সকলো আয়তক্ষেত্ৰ স্পৰ্শ কৰক", 
+    bn: "সব আয়তক্ষেত্রগুলো স্পর্শ করুন", 
+    mni: "আয়ত পুম্নমক নাম্মু" 
+  },
+  star: { 
+    en: "Tap all the stars", 
+    hi: "सभी तारे छुएँ", 
+    as: "সকলো তৰা স্পৰ্শ কৰক", 
+    bn: "সব তারাগুলো স্পর্শ করুন", 
+    mni: "থৌৱাল পুম্নমক নাম্মু" 
+  },
+  pentagon: { 
+    en: "Tap all the pentagons", 
+    hi: "सभी पंचभुज छुएँ", 
+    as: "সকলো পঞ্চভুজ স্পৰ্শ কৰক", 
+    bn: "সব পঞ্চভুজগুলো স্পর্শ করুন", 
+    mni: "পঞ্চভুজ পুম্নমক নাম্মু" 
+  },
 };
 
 const LEVEL_ROUNDS = {
@@ -99,13 +223,35 @@ export function buildShapeSortRound(level, lang) {
 }
 
 function instructionFor(target, lang) {
-  if (target.kind === "shape") return localized(SHAPE_INSTRUCTIONS[target.value], lang, `shape.${target.value}`);
-  if (target.kind === "emoji") {
-    const row = EMOJIS.find((e) => e.value === target.value);
-    return localized({ en: `Tap all the ${row ? row.en : "matching items"}`, hi: `सभी ${row ? row.hi : "मेल खाती चीज़ें"} छुएँ` }, lang, `emoji.${target.value}`);
+  if (target.kind === "shape") {
+    return localized(SHAPE_INSTRUCTIONS[target.value], lang, `shape.${target.value}`);
   }
-  const obj = OBJECT_ITEMS.find((o) => o.id === target.value);
-  return localized({ en: `Tap all the ${obj ? obj.en : "matching items"}`, hi: `सभी ${obj ? obj.hi : "मेल खाती चीज़ें"} छुएँ` }, lang, `object.${target.value}`);
+
+  const matchTemplate = {
+    en: (name) => `Tap all the ${name}`,
+    hi: (name) => `सभी ${name} छुएँ`,
+    as: (name) => `সকলো ${name} স্পৰ্শ কৰক`,
+    bn: (name) => `সব ${name} স্পর্শ করুন`,
+    mni: (name) => `${name} পুম্নমক নাম্মু`,
+  };
+
+  const fallbacks = {
+    en: "matching items",
+    hi: "मेल खाती चीज़ें",
+    as: "মিলা বস্তুবোৰ",
+    bn: "মিল থাকা বস্তুগুলো",
+    mni: "চানবা পোৎলমশিং",
+  };
+
+  const currentLang = matchTemplate[lang] ? lang : "en";
+  const item = target.kind === "emoji"
+    ? EMOJIS.find((e) => e.value === target.value)
+    : OBJECT_ITEMS.find((o) => o.id === target.value);
+
+  const localizedName = (item && item[lang]) ? item[lang] : fallbacks[currentLang];
+  const renderedText = matchTemplate[currentLang](localizedName);
+
+  return localized({ [lang]: renderedText }, lang, `${target.kind}.${target.value}`);
 }
 
 function localized(values, lang, key) {

@@ -86,6 +86,7 @@ export function mountShapeSort(root, { lang, level, onHome }) {
           if (timerId) clearInterval(timerId);
           onHome();
         },
+        speechControls: true,
       }),
     );
 
@@ -188,5 +189,8 @@ export function mountShapeSort(root, { lang, level, onHome }) {
 function foundLabel(lang, found, total) {
   if (lang === "en") return `Found ${found} of ${total}`;
   if (lang === "hi") return `${found} / ${total} मिल गए`;
+  if (lang === "as") return `${found} / ${total} বিচাৰি পালে`;
+  if (lang === "bn") return `${found} / ${total} খুঁজে পেয়েছেন`;
+  if (lang === "mni") return `${found} / ${total} ফংলে`;
   return `${found} / ${total} ${missingTranslation(lang, "shape.foundLabel")}`;
 }
