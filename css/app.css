@@ -87,6 +87,15 @@ button {
   max-width: 280px;
 }
 
+.header-actions .btn-stop {
+  color: var(--miss);
+}
+
+.header-actions .btn-stop:hover,
+.header-actions .btn-stop:focus-visible {
+  color: var(--text);
+}
+
 .btn {
   background: var(--terracotta);
   color: var(--white);

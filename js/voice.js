@@ -129,3 +129,19 @@ export function repeatLast() {
   if (!lastSpokenText) return;
   speak(lastSpokenText);
 }
+
+export function stopSpeaking() {
+  ++speakGeneration;
+  if (speakTimer) {
+    window.clearTimeout(speakTimer);
+    speakTimer = 0;
+  }
+  activeUtterance = null;
+
+  if (!('speechSynthesis' in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+  } catch {
+    /* ignore */
+  }
+}

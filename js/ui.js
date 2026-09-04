@@ -1,5 +1,5 @@
 import { t } from "./i18n.js";
-import { repeatLast } from "./voice.js";
+import { repeatLast, stopSpeaking } from "./voice.js";
 import { clampLevel, levelTier } from "./adaptive.js";
 
 export function levelSubtitle(lang, level) {
@@ -43,6 +43,7 @@ export function header(lang, { title, subtitle, onBack }) {
         ? el("button", { className: "btn btn-light", type: "button", onClick: onBack }, t(lang, "back"))
         : null,
       el("button", { className: "btn btn-light", type: "button", onClick: repeatLast }, t(lang, "repeat")),
+      el("button", { className: "btn btn-light btn-stop", type: "button", onClick: stopSpeaking }, t(lang, "stop")),
     ),
   );
 }
