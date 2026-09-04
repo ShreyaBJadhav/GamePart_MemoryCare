@@ -8,6 +8,7 @@ import { mountFaceNameRecall } from "./games/faceNameRecall.js";
 import { mountRememberMyStory } from "./games/rememberMyStory.js";
 import { mountFamilyPhotos } from "./familyPeople.js";
 import { mountProgress } from "./progress.js";
+import { mountBreathing } from "./breathing.js";
 
 const GAMES = [
   { id: GAME_TYPES.pattern_matching, nameKey: "patternName", blurbKey: "patternBlurb", mount: mountPatternMatching },
@@ -97,6 +98,11 @@ async function showHome(root) {
       type: "button",
       onClick: () => mountProgress(root, { lang, onBack: () => showHome(root) }),
     }, t(lang, "myProgress")),
+    el("button", {
+      className: "btn breathing-home-btn",
+      type: "button",
+      onClick: () => mountBreathing(root, { lang, onHome: () => showHome(root) }),
+    }, t(lang, "breathingName"), el("span", { className: "home-card-detail" }, t(lang, "breathingBlurb"))),
     el("button", {
       className: "btn",
       type: "button",

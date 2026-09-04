@@ -13,7 +13,7 @@
  *   Navigations fall back to the cached index.html when offline.
  */
 
-const CACHE_NAME = "memorycare-v12";
+const CACHE_NAME = "memorycare-v13";
 
 const PRECACHE = [
   "./",
@@ -29,6 +29,7 @@ const PRECACHE = [
   "./js/ui.js",
   "./js/familyPeople.js",
   "./js/progress.js",
+  "./js/breathing.js",
   "./js/games/patternMatching.js",
   "./js/games/shapeSort.js",
   "./js/games/faceNameRecall.js",

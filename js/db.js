@@ -29,6 +29,14 @@ db.version(2).stores({
   familyMembers: "++id, patientId, relationshipKey",
 });
 
+db.version(3).stores({
+  patients: "++id",
+  gameProgress: "++id, patientId, gameType, [patientId+gameType]",
+  game_results: "++id, gameType, timestamp, sync_status",
+  familyMembers: "++id, patientId, relationshipKey",
+  breathingSessions: "id, patientId, activityType, timestamp, sync_status",
+});
+
 export async function ensurePatient() {
   const existing = await db.patients.get(DEFAULT_PATIENT_ID);
   if (!existing) {
@@ -155,6 +163,22 @@ export async function saveGameResult(record) {
     sync_status: "PENDING",
     timestamp: new Date().toISOString(),
   });
+}
+
+export async function saveBreathingSession({ cyclesCompleted, totalTimeSeconds }) {
+  return db.breathingSessions.add({
+    id: globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    patientId: DEFAULT_PATIENT_ID,
+    activityType: "breathing_exercise",
+    cyclesCompleted,
+    totalTimeSeconds,
+    timestamp: new Date().toISOString(),
+    sync_status: "PENDING",
+  });
+}
+
+export async function listBreathingSessions() {
+  return db.breathingSessions.toArray();
 }
 
 export async function applyAdaptiveAndSave(gameType, metrics) {

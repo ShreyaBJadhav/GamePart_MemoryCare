@@ -1,6 +1,6 @@
 import { el, header, levelSubtitle } from "./ui.js";
 import { t, tf } from "./i18n.js";
-import { GAME_TYPES, getPlayLevel, listGameResults } from "./db.js";
+import { GAME_TYPES, getPlayLevel, listGameResults, listBreathingSessions } from "./db.js";
 
 const RECENT_DAYS = 7;
 const GAME_KEYS = [
@@ -12,6 +12,7 @@ const GAME_KEYS = [
 
 export async function mountProgress(root, { lang, onBack }) {
   const results = await listGameResults();
+  const breathingSessions = await listBreathingSessions();
   const cutoff = Date.now() - RECENT_DAYS * 24 * 60 * 60 * 1000;
   const recentResults = results.filter((result) => Date.parse(result.timestamp) >= cutoff);
   const averageAccuracy = recentResults.length
@@ -50,6 +51,20 @@ export async function mountProgress(root, { lang, onBack }) {
       ),
     ));
   }
+
+  const recentBreathing = breathingSessions.filter((session) => Date.parse(session.timestamp) >= cutoff);
+  const latestBreathing = breathingSessions.slice().sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp))[0];
+  screen.append(el("section", { className: "progress-activity-card" },
+    el("h3", {}, t(lang, "breathingName")),
+    el("div", { className: "progress-game-row" },
+      el("span", {}, t(lang, "progressLastPlayed")),
+      el("strong", {}, latestBreathing ? relativeDay(lang, latestBreathing.timestamp) : t(lang, "progressNotPlayed")),
+    ),
+    el("div", { className: "progress-game-row" },
+      el("span", {}, recentBreathing.length ? tf(lang, "breathingSessionsThisWeek", { n: recentBreathing.length }) : t(lang, "breathingNoSessions")),
+      el("strong", {}, t(lang, "calmingActivity")),
+    ),
+  ));
 
   root.replaceChildren(header(lang, { title: t(lang, "progressTitle"), onBack }), screen);
 }
