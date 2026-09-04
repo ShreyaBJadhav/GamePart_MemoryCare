@@ -507,6 +507,70 @@ button {
   font-size: 22px;
 }
 
+.progress-range-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.progress-range-tab {
+  min-height: 58px;
+  border: 2px solid var(--terracotta);
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--terracotta);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.progress-range-tab[aria-selected="true"] {
+  background: var(--terracotta);
+  color: var(--white);
+}
+
+.progress-summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.progress-summary-item,
+.progress-chart-panel {
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.progress-summary-item strong {
+  display: block;
+  color: var(--terracotta);
+  font-size: 30px;
+}
+
+.progress-summary-item span {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 17px;
+}
+
+.progress-chart-panel {
+  margin-bottom: 16px;
+}
+
+.progress-chart-panel h3 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+
+.progress-chart-wrap {
+  height: 260px;
+  position: relative;
+}
+
 .progress-game-card,
 .progress-activity-card {
   background: var(--white);
