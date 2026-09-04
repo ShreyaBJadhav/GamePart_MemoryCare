@@ -144,6 +144,10 @@ export async function getPlayLevel(gameType) {
   return clampLevel(progress.currentLevel);
 }
 
+export async function listGameResults() {
+  return db.game_results.toArray();
+}
+
 export async function saveGameResult(record) {
   return db.game_results.add({
     ...record,

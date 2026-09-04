@@ -7,6 +7,7 @@ import { mountShapeSort } from "./games/shapeSort.js";
 import { mountFaceNameRecall } from "./games/faceNameRecall.js";
 import { mountRememberMyStory } from "./games/rememberMyStory.js";
 import { mountFamilyPhotos } from "./familyPeople.js";
+import { mountProgress } from "./progress.js";
 
 const GAMES = [
   { id: GAME_TYPES.pattern_matching, nameKey: "patternName", blurbKey: "patternBlurb", mount: mountPatternMatching },
@@ -91,6 +92,11 @@ async function showHome(root) {
       style: { width: "100%", marginTop: "18px" },
       onClick: () => mountFamilyPhotos(root, { lang, onBack: () => showHome(root) }),
     }, t(lang, "familyPhotos")),
+    el("button", {
+      className: "btn progress-home-btn",
+      type: "button",
+      onClick: () => mountProgress(root, { lang, onBack: () => showHome(root) }),
+    }, t(lang, "myProgress")),
     el("button", {
       className: "btn",
       type: "button",
